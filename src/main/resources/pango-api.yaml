@@ -22,10 +22,6 @@ paths:
       description: |
         The Properties endpoint returns information about *Pango* rental properties available around a given location. The response includes the display name and other details about the rental property and lists the the property in the proper display order by distance.
       parameters:
-        - name: user-token
-          in: header
-          type: string
-          description: User access token
         - name: latitude
           in: query
           description: Latitude component of location.
@@ -53,12 +49,11 @@ paths:
       - Properties
       responses:
         200:
-          description: Successful response
+          description: An array of rental properties
           schema:
-            title: ArrayOfPersons
             type: array
             items:
-              title: Person
+              title: Property
               type: object
               properties:
                 name:
@@ -69,16 +64,20 @@ paths:
           description: An error with a status code between  4XX and 5XX
           schema:
             $ref: "#/definitions/Error"
-            
-                  
+
+
 definitions:
   Error:
    type: object
    properties:
-     code: 
+     code:
        type: integer
        format: int32
      message:
        type: string
      fields:
       type: string
+
+
+
+
