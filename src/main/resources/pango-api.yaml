@@ -1,0 +1,80 @@
+# Pango APIs
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.1"
+  title: Pango API
+  description: Move you App forwad with Pango API
+  # The Domain of Service
+host: api.chaguapango.com 
+#Array of sll schemes Pango API supports
+schemes:
+   - https
+# Will be prefixed to all paths   
+basePath: /v1
+produces: 
+ - application/json
+paths:
+  /properties:
+    get:
+      summary: Rental Properties
+      description: |
+        The Properties endpoint returns information about *Pango* rental properties available around a given location. The response includes the display name and other details about the rental property and lists the the property in the proper display order by distance.
+      parameters:
+        - name: latitude
+          in: query
+          description: Latitude component of location.
+          required: true
+          type: number
+          format: double
+        - name: longitude
+          in: query
+          description: Longitude component of location.
+          required: true
+          type: number
+          format: double
+        - name: type
+          in: query
+          type: string
+          required: true
+          description: The type of properties either Home or Business
+        - name: moveInDate
+          in: query
+          type: string
+          required: true
+          format: yyyy-mm-dd|yyy-mm-dd
+          description: The expected moving in date range, from and to date sepearted by | operator
+      tags:
+      - Properties
+      responses:
+        200:
+          description: Successful response
+          schema:
+            title: ArrayOfPersons
+            type: array
+            items:
+              title: Person
+              type: object
+              properties:
+                name:
+                  type: string
+                single:
+                  type: boolean
+        default:
+          description: An error with a status code between  4XX and 5XX
+          schema:
+            $ref: "#/definitions/Error"
+            
+                  
+definitions:
+  Error:
+   type: object
+   properties:
+     code: 
+       type: integer
+       format: int32
+     message:
+       type: string
+     fields:
+      type: string
