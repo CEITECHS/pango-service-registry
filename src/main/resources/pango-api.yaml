@@ -20,8 +20,13 @@ paths:
     get:
       summary: Rental Properties
       description: |
-        The Properties endpoint returns information about *Pango* rental properties available around a given location. The response includes the display name and other details about the rental property and lists the the property in the proper display order by distance.
+        The Properties endpoint returns information about *Pango* rental properties available around a given location. The response includes some details about the rental property and lists the the property in the proper display order by distance.
       parameters:
+        - name: user-token
+          in: header
+          type: string
+          description: user access token
+          required: false
         - name: latitude
           in: query
           description: Latitude component of location.
@@ -34,6 +39,11 @@ paths:
           required: true
           type: number
           format: double
+        - name: radius
+          in: query
+          description: within distance from location, default is 25 Kilometers
+          type: integer
+          format: int32
         - name: type
           in: query
           type: string
@@ -43,7 +53,7 @@ paths:
           in: query
           type: string
           required: true
-          format: yyyy-mm-dd|yyy-mm-dd
+          format: yyyy-mm-dd|yyyy-mm-dd
           description: The expected moving in date range, from and to date sepearted by | operator
       tags:
       - Properties
@@ -53,13 +63,7 @@ paths:
           schema:
             type: array
             items:
-              title: Property
-              type: object
-              properties:
-                name:
-                  type: string
-                single:
-                  type: boolean
+              $ref: "#/definitions/Property"
         default:
           description: An error with a status code between  4XX and 5XX
           schema:
@@ -67,6 +71,70 @@ paths:
 
 
 definitions:
+  Property:
+   type: object
+   properties:
+     purpose:
+       type: string
+       description: Information representing whether the property is for rent or sale
+       default: FOR RENT
+     price:
+       type: number
+       format: double
+       description: Peice for renting or Buying this property
+     currency:
+       type: string
+     periodPrice:
+       type: string
+       description: Base period price. Ex-  per month(mo),  per year (yr)
+       default: mo
+     numberOfRooms:
+       type: integer
+       format: int32
+       description: Total number of rooms in this property unit
+     numberOfBedRooms:
+       type: integer
+       format: int32
+       description: Total number of bed rooms in this property unit
+     numberOfSelfContainedBedRooms:
+        type: integer
+        format: int32
+        description: Total number of bedrooms containing a bathroom in this property unit
+     numberOfBathRooms:
+        type: integer
+        format: int32
+     numberOfKitchens:
+       type: integer
+       format: int32
+     propertySize:
+      type: number
+      format: double
+      description:  Square unit area of the property
+     propertySizeUnit:
+      type : string
+      default: sqft
+     availability:
+      type: string
+      description: Value represeanting whether the property is available now or soon
+     rating:
+      type: integer
+      format: int32
+      description: Number representing everage stars rating out of 5 for this property
+     reviewCount:
+      type: integer
+      format: int32
+      description : Total number of tenant reviews on this property to date
+     image:
+      type: string
+      description: Image URL representing the property
+     distance:
+      type: number
+      format: double
+      description: Total distnace in Kelometers from the location
+     address:
+      type: string
+      description: Physical address of the property
+
   Error:
    type: object
    properties:
