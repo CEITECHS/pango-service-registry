@@ -22,6 +22,10 @@ paths:
       description: |
         The Properties endpoint returns information about *Pango* rental properties available around a given location. The response includes the display name and other details about the rental property and lists the the property in the proper display order by distance.
       parameters:
+        - name: user-token
+          in: header
+          type: string
+          description: User access token
         - name: latitude
           in: query
           description: Latitude component of location.
