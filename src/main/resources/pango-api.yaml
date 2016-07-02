@@ -68,6 +68,33 @@ paths:
           description: An error with a status code between  4XX and 5XX
           schema:
             $ref: "#/definitions/Error"
+  /properies/{propertyReferenceId}:
+     get:
+       summary: A specific rental property
+       description: The Property endpoint returns detailed information of a specific Pango rental property
+       parameters:
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: true
+       tags:
+       - Property
+       responses:
+         200:
+           description: Detailed information of the property
+           schema:
+            $ref: "#/definitions/PropertyDetail"
+         default:
+          description: An error with a status code between  4XX and 5XX
+          schema:
+           $ref: "#/definitions/Error"
+
 
 
 definitions:
@@ -134,6 +161,72 @@ definitions:
      address:
       type: string
       description: Physical address of the property
+  PropertyDetail:
+   type: object
+   properties:
+     purpose:
+       type: string
+       description: Information representing whether the property is for rent or sale
+       default: FOR RENT
+     price:
+       type: number
+       format: double
+       description: Peice for renting or Buying this property
+     currency:
+       type: string
+     periodPrice:
+       type: string
+       description: Base period price. Ex-  per month(mo),  per year (yr)
+       default: mo
+     numberOfRooms:
+       type: integer
+       format: int32
+       description: Total number of rooms in this property unit
+     numberOfBedRooms:
+       type: integer
+       format: int32
+       description: Total number of bed rooms in this property unit
+     numberOfSelfContainedBedRooms:
+        type: integer
+        format: int32
+        description: Total number of bedrooms containing a bathroom in this property unit
+     numberOfBathRooms:
+        type: integer
+        format: int32
+     numberOfKitchens:
+       type: integer
+       format: int32
+     propertySize:
+      type: number
+      format: double
+      description:  Square unit area of the property
+     propertySizeUnit:
+      type : string
+      default: sqft
+     availability:
+      type: string
+      description: Value represeanting whether the property is available now or soon
+     rating:
+      type: integer
+      format: int32
+      description: Number representing everage stars rating out of 5 for this property
+     reviewCount:
+      type: integer
+      format: int32
+      description : Total number of tenant reviews on this property to date
+     images:
+      type: array
+      items:
+        type: string
+        description: Image URL representing the property
+      description: Image URLS representing the property
+     distance:
+      type: number
+      format: double
+      description: Total distnace in Kelometers from the location
+     address:
+      type: string
+      description: Physical address of the property
 
   Error:
    type: object
@@ -145,7 +238,5 @@ definitions:
        type: string
      fields:
       type: string
-
-
 
 
