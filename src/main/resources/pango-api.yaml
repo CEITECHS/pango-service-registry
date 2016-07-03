@@ -68,10 +68,11 @@ paths:
           description: An error with a status code between  4XX and 5XX
           schema:
             $ref: "#/definitions/Error"
-  /properies/{propertyReferenceId}:
+  /properties/{propertyReferenceId}:
      get:
        summary: A specific rental property
-       description: The Property endpoint returns detailed information of a specific Pango rental property
+       description: |
+         The Property endpoint returns detailed information of a specific Pango rental property
        parameters:
        - name: propertyReferenceId
          in: path
@@ -94,7 +95,66 @@ paths:
           description: An error with a status code between  4XX and 5XX
           schema:
            $ref: "#/definitions/Error"
-
+  /properties/{propertyReferenceId}/enquiries:
+    post:
+     summary: Creates a new Enquiry to the landlord about Pango based property
+     description: |
+        The Enquiries endpoint to create a new Enquiry about  a Pango based property, that will
+          subsequently notify the landloards about this new intent about their properties
+     tags:
+      - Enquiry
+     consumes:
+      - application/json
+     parameters:
+      - name: user-token
+        in: header
+        type: string
+        description: user access token
+        required: true
+      - name: propertyReferenceId
+        in: path
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+         $ref: "#/definitions/Enquiry"
+     responses:
+       201:
+         description: The request has been fulfilled and resulted in a new resource being created
+       default:
+        description: An error with a status code between  4XX and 5XX
+        schema:
+         $ref: "#/definitions/Error"
+  /properties/{propertyReferenceId}/enquiries/{enquiryReferenceId}:
+    put:
+     summary: Updates an existing Enquiry  with correspondence between the potential tenant and the londlord
+     tags:
+      - Enquiry
+      - Correspondence
+     consumes:
+      - application/json
+     parameters:
+      - name: user-token
+        in: header
+        type: string
+        required: true
+      - name: propertyReferenceId
+        in: path
+        type: string
+        required: true
+      - name: enquiryReferenceId
+        in: path
+        type: string
+        required: true
+     responses:
+       200:
+         description: Successful operation
+       default:
+         description: An error with a status code between  4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
 
 
 definitions:
@@ -151,7 +211,7 @@ definitions:
       type: integer
       format: int32
       description : Total number of tenant reviews on this property to date
-     image:
+     photoUrl:
       type: string
       description: Image URL representing the property
      distance:
@@ -234,7 +294,7 @@ definitions:
       type: integer
       format: int32
       description : Total number of tenant reviews on this property to date
-     images:
+     photoUrls:
       type: array
       items:
         type: string
@@ -254,6 +314,21 @@ definitions:
       type: string
       description: Terms,  conditions and any restrictions information
 
+  Enquiry:
+   type: object
+   properties:
+    subject:
+     type: string
+    introduction:
+     type: string
+     description: The quick introduction about the prospective tenant and their needs. For Example. I`m John Doe, married and blessed with two children teaching at Mawenzi Sec , searching for a home to accommodate my family
+    message:
+     type: string
+     description: Detailed message to the landlord inticating the intentions and expected responses. For Example. I`m interested in this property and I would like you to schedule me up for site visit as soon as possible
+    enquiredOn:
+     type: string
+     format: yyyy-mm-dd
+     description: The Enquiry date
 
   Error:
    type: object
