@@ -53,7 +53,7 @@ paths:
           in: query
           type: string
           required: true
-          format: yyyy-mm-dd|yyyy-mm-dd
+          format: "YYYY-MM-DD|YYYY-MM-DD"
           description: The expected moving in date range, from and to date sepearted by | operator
       tags:
       - Properties
@@ -127,9 +127,70 @@ paths:
         description: An error with a status code between  4XX and 5XX
         schema:
          $ref: "#/definitions/Error"
-  /properties/{propertyReferenceId}/enquiries/{enquiryReferenceId}:
+    get:
+      tags:
+       - Enquiry
+      summary: Enquiries to this property.
+      description: |
+        This endpoint returns information about enquiries to this property by the current user(potential-tenant) default or All the enquiries made by many potential tenants to this property primariry for the landlord to access.
+      parameters:
+       - name: propertyReferenceId
+         in: path
+         type: string
+         required: true
+       - name: user-token
+         in: header
+         required: true
+         type: string
+       - name: landloardIndicator
+         in: query
+         type: boolean
+         default: false
+         description: Relevance access indicator, whether it's being accessed by landloard or potential tenant
+      responses:
+        200:
+         description: An array of Enquiries
+         schema:
+          type: array
+          items:
+            $ref: "#/definitions/Enquiry"
+        default:
+          description: An error with a status code between  4XX and 5XX
+          schema:
+            $ref: "#/definitions/Error"
+  /properties/enquiries:
+     get:
+       tags:
+        - Enquiry
+       summary: Enquiries history
+       description: |
+          The endpoint returns information about  the Enquiries made by the user to different *Pango* properties when accessed by pontential tenants or Enquiries to *Pango* properties owned by the user when accessed by landloards. The response include some details about the rental property(grouped by) and enquiries to it,  in the proper display order of relevance.
+       parameters:
+        - name: user-token
+          in: header
+          type: string
+          required: true
+        - name: landloardIndicator
+          in: query
+          type: boolean
+          default: false
+          description: Relevance access indicator, whether it's being accessed by landloard or potential tenant
+       responses:
+         200:
+           description: An an Array of Enquiries grouped by properties
+           schema:
+            type: array
+            items:
+             $ref: "#/definitions/PropertyEnquiry"
+         default:
+           description: An error with a status code between 4XX and 5XX
+           schema:
+             $ref: "#/definitions/Error"
+
+
+  /properties/enquiries/{enquiryReferenceId}:
     put:
-     summary: Updates an existing Enquiry  with correspondence between the potential tenant and the londlord
+     summary: Updates an existing Enquiry  with correspondence from either the potential tenant or the londlord
      tags:
       - Enquiry
       - Correspondence
@@ -140,17 +201,42 @@ paths:
         in: header
         type: string
         required: true
-      - name: propertyReferenceId
-        in: path
-        type: string
-        required: true
       - name: enquiryReferenceId
         in: path
         type: string
         required: true
+      - name: body
+        in: body
+        required: true
+        schema:
+         $ref: "#/definitions/Correspondence"
      responses:
        200:
          description: Successful operation
+       default:
+         description: An error with a status code between  4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
+    get:
+     summary: Enquiry Details
+     description: The endpoint returns detailed information about the Enquiry with it's associated correspondence
+     tags:
+      - Enquiry
+      - Correspondence
+     parameters:
+      - name: enquiryReferenceId
+        in: path
+        required: true
+        type: string
+      - name: user-token
+        in: header
+        required: true
+        type: string
+     responses:
+       200:
+         description: detailed Enquiry with it's responses
+         schema:
+          $ref: "#/definitions/Enquiry"
        default:
          description: An error with a status code between  4XX and 5XX
          schema:
@@ -212,8 +298,7 @@ definitions:
       format: int32
       description : Total number of tenant reviews on this property to date
      photoUrl:
-      type: string
-      description: Image URL representing the property
+       $ref: "#/definitions/Attachment"
      distance:
       type: number
       format: double
@@ -234,7 +319,7 @@ definitions:
      price:
        type: number
        format: double
-       description: Peice for renting or Buying this property
+       description: Price for renting or Buying this property
      currency:
        type: string
      periodPrice:
@@ -271,7 +356,7 @@ definitions:
       description: Value represeanting whether the property is available now or soon
      availableOn:
       type: string
-      format: yyyy-mm-dd
+      format: YYYY-MM-DD
       description: Available on (future date) or available since (past date)
      rentalPeriod:
       type: string
@@ -297,9 +382,8 @@ definitions:
      photoUrls:
       type: array
       items:
-        type: string
-        description: Image URL representing the property
-      description: Image URLS representing the property
+        $ref: "#/definitions/Attachment"
+      description: Images encoded in base64 representing the property
      address:
       type: string
       description: Physical address of the
@@ -313,12 +397,12 @@ definitions:
      terms:
       type: string
       description: Terms,  conditions and any restrictions information
-
   Enquiry:
    type: object
    properties:
     subject:
      type: string
+     description: The subject of this Enquiry. For Example Interested, or Need More Information about this Unit etc
     introduction:
      type: string
      description: The quick introduction about the prospective tenant and their needs. For Example. I`m John Doe, married and blessed with two children teaching at Mawenzi Sec , searching for a home to accommodate my family
@@ -327,9 +411,100 @@ definitions:
      description: Detailed message to the landlord inticating the intentions and expected responses. For Example. I`m interested in this property and I would like you to schedule me up for site visit as soon as possible
     enquiredOn:
      type: string
-     format: yyyy-mm-dd
-     description: The Enquiry date
+     format: "YYYY-MM-DDThh:mm:ssTZD"
+     description: The Enquiry date and time of the enquiry
+    correspondenceCount:
+     type: integer
+     format: int32
+     description: Total messages count exchanged between the two parties to this Enquiry
+    correspondence:
+      type: array
+      description: An array of correspondence, applicable to only to the get operation.
+      items:
+       $ref: "#/definitions/Correspondence"
+  PropertyEnquiry:
+   type: object
+   properties:
+     enquires:
+       description: An array of enquiries to this property
+       type: array
+       items:
+        $ref:  "#/definitions/Enquiry"
+     propertyReferenceId:
+       type: string
+     purpose:
+       type: string
+       description: Information representing whether the property is for rent or sale
+       default: FOR RENT
+     price:
+       type: number
+       format: double
+       description: Price for renting or Buying this property
+     currency:
+       type: string
+     periodPrice:
+       type: string
+       description: Base period price. Ex-  per month(mo),  per year (yr)
+       default: mo
+     numberOfRooms:
+       type: integer
+       format: int32
+       description: Total number of rooms in this property unit
+     numberOfBedRooms:
+       type: integer
+       format: int32
+       description: Total number of bed rooms in this property unit
+     numberOfSelfContainedBedRooms:
+        type: integer
+        format: int32
+        description: Total number of bedrooms containing a bathroom in this property unit
+     numberOfBathRooms:
+        type: integer
+        format: int32
+     numberOfKitchens:
+       type: integer
+       format: int32
+     propertySize:
+      type: number
+      format: double
+      description:  Square unit area of the property
+     propertySizeUnit:
+      type : string
+      default: sqft
+     availability:
+      type: string
+      description: Value represeanting whether the property is available now or soon
+  Correspondence:
+   type: object
+   properties:
+    message:
+     type: string
+    correspondenceType:
+     type: string
+     description: general category about this response. For Example . SITE_VISIT, TAKEN, REQUEST_INFO etc.
+    respondedOn:
+     type: string
+     format: "YYYY-MM-DDThh:mm:ssTZD"
+     description: The response date and time of the enquiry
+    attachments:
+     type: array
+     description: an array of attchment contents requested by either parties up to 3 attachments
+     items:
+      $ref: "#/definitions/Attachment"
 
+  Attachment:
+   type: object
+   properties:
+    content:
+     type: string
+     description: base64 encoded attachment content. for Pictures etc
+    extension:
+     type: string
+     description: File Mimetype. For Example png, jpeg, pdf
+    size:
+     type: number
+     format: double
+     description: orginal content size in bytes
   Error:
    type: object
    properties:
@@ -340,7 +515,3 @@ definitions:
        type: string
      fields:
       type: string
-
-
-
-
