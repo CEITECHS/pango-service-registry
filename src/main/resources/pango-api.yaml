@@ -164,6 +164,9 @@ definitions:
   PropertyDetail:
    type: object
    properties:
+     propertyDescription:
+      type: string
+      description: summary description of the property
      purpose:
        type: string
        description: Information representing whether the property is for rent or sale
@@ -206,6 +209,23 @@ definitions:
      availability:
       type: string
       description: Value represeanting whether the property is available now or soon
+     availableOn:
+      type: string
+      format: yyyy-mm-dd
+      description: Available on (future date) or available since (past date)
+     rentalPeriod:
+      type: string
+      description: Lease Length. For Example 12 Month Lease
+     generalFeatures:
+      type: array
+      description: General features of the property compaund. For Example Fitness Center, Pool, Garden, Controlled Access etc
+      items:
+       type: string
+     propertyFeatures:
+      type: array
+      description: Additional features to better describe this property. For Example  Air Conditioning, Ceiling Fans, Cable Ready, Washer/Dryer etc
+      items:
+       type: string
      rating:
       type: integer
       format: int32
@@ -220,13 +240,20 @@ definitions:
         type: string
         description: Image URL representing the property
       description: Image URLS representing the property
-     distance:
-      type: number
-      format: double
-      description: Total distnace in Kelometers from the location
      address:
       type: string
-      description: Physical address of the property
+      description: Physical address of the
+     location:
+      type: array
+      description: Longitide[0] and Latitude[1] location components of this property. For Example [-73.93383000695911, 40.81949109558767] implying a property is located at -73.93414657 longitude and 40.82302903 latitude.
+      items:
+        type: number
+        format: double
+        description: location component
+     terms:
+      type: string
+      description: Terms,  conditions and any restrictions information
+
 
   Error:
    type: object
@@ -238,5 +265,7 @@ definitions:
        type: string
      fields:
       type: string
+
+
 
 
