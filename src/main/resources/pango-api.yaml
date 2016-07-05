@@ -44,17 +44,35 @@ paths:
           description: within distance from location, default is 25 Kilometers
           type: integer
           format: int32
-        - name: type
+        - name: propertyPurpose
           in: query
           type: string
           required: true
-          description: The type of properties either Home or Business
+          default: Home
+          description: The purpose of use for properties either Home or Business place
         - name: moveInDate
           in: query
           type: string
           required: true
           format: "YYYY-MM-DD|YYYY-MM-DD"
           description: The expected moving in date range, from and to date sepearted by | operator
+        - name: roomsCount
+          in: query
+          type: integer
+          format: int32
+          default: 1
+          description: indicating properties should contain this rooms count
+        - name: bedRoomsCount
+          in: query
+          type: integer
+          format: int32
+          default: 0
+          description: indicating properties should contain this bedrooms count
+        - name: selfContainedRooms
+          in: query
+          type: boolean
+          default: false
+          description: indicating properties must contain at least a self contained room
       tags:
       - Properties
       responses:
@@ -248,6 +266,12 @@ definitions:
    type: object
    properties:
      purpose:
+      type: string
+      description: Information indicating what this property is good for, For Example. Home or Business
+     propertyDescription:
+      type: string
+      description: summary description of the property
+     listingFor:
        type: string
        description: Information representing whether the property is for rent or sale
        default: FOR RENT
@@ -309,10 +333,13 @@ definitions:
   PropertyDetail:
    type: object
    properties:
+     purpose:
+      type: string
+      description: Information indicating what this property is good for, For Example. Home or Business
      propertyDescription:
       type: string
       description: summary description of the property
-     purpose:
+     listingFor:
        type: string
        description: Information representing whether the property is for rent or sale
        default: FOR RENT
