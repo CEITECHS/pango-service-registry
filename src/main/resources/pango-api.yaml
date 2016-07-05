@@ -259,7 +259,61 @@ paths:
          description: An error with a status code between  4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-
+  /signUp:
+    post:
+     tags:
+       - Registration
+     consumes:
+       - application/json
+     summary: Creates a new  Pango user.
+     description:  An endpoint for creating a new Pango user,  an email with verification link send to the registed email
+     parameters:
+       - name: body
+         in: body
+         required: true
+         schema:
+          $ref: "#/definitions/Customer"
+     responses:
+       201:
+        description: Ok, User resgistered, sent  varification email
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
+  /authenticate:
+    post:
+     tags:
+      - Login
+     consumes:
+      - application/json
+     summary: Authenticate user by username and password
+     description: |
+        An endpoint for authenticate a pango user with supplied userName and password, an expiring access token is returned alongise the username as well the customerReferenceId
+     parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+         $ref: "#/definitions/Login"
+     responses:
+       200:
+        description: access-token , customerReferenceId and username
+        schema:
+         type: object
+         properties:
+          userName:
+           type: string
+           description: logged in username
+          customerReferenceId:
+           type: string
+           description: to be used in subsequent api calls
+          access-token:
+           type: string
+           description: expiring encrypted access token, to be used in all API call for the loggged in user
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
 
 definitions:
   Property:
@@ -518,7 +572,6 @@ definitions:
      description: an array of attchment contents requested by either parties up to 3 attachments
      items:
       $ref: "#/definitions/Attachment"
-
   Attachment:
    type: object
    properties:
@@ -542,3 +595,128 @@ definitions:
        type: string
      fields:
       type: string
+  Customer:
+   type: object
+   properties:
+    firstName:
+     type: string
+    lastName:
+     type: string
+    phoneNumber:
+     type: string
+    altnatePhoneNumber:
+     type: string
+    emailAddress:
+     type: string
+    alternateEmailAddress:
+     type: string
+    address:
+     $ref: "#/definitions/Address"
+    profile:
+     $ref: "#/definitions/CustomerProfile"
+  CustomerProfile:
+   type: object
+   properties:
+    userName:
+     type: string
+    password:
+     type: string
+    profilePicture:
+     $ref: "#/definitions/Attachment"
+    verified:
+     type: boolean
+    verificationCode:
+     type: string
+    verificationDate:
+     type: string
+     format: YYY-MM-DD
+    joinedDate:
+     type: string
+     format: YYYY-MM-DD
+    serachHistory:
+      type: array
+      items:
+       $ref: "#/definitions/SearchCriteria"
+  CustomerPreference:
+   type: object
+   properties:
+    customerReferenceId:
+     type: string
+    preferenceType:
+     type: string
+     description: reason for this preference. For Example. Notification
+    startDate:
+     type: string
+     format: YYYY-MM-DD
+    toDate:
+     type: string
+     format: YYYY-MM_DD
+    forDays:
+     type: integer
+     format: int32
+    active:
+     type: boolean
+     description: status display or if set to false will diactivate preference
+    paid:
+     type: boolean
+    paidOn:
+     type: string
+     format: YYYY-MM-DD
+    notify:
+     type: boolean
+    notifyOnCriteria:
+     $ref: "#/definitions/SearchCriteria"
+  SearchCriteria:
+   type: object
+   properties:
+    searchDate:
+     type: string
+     format: "YYYY-MM-DDThh:mm:ssTZD"
+    longitude:
+     type: number
+     format: double
+    latitude:
+     type: number
+     format: double
+    radius:
+     type: integer
+     format: int32
+    propertyPurpose:
+     type: string
+    moveInDate:
+     type: string
+    roomsCount:
+     type: integer
+     format: int32
+    bedRoomsCount:
+     type: integer
+     format: int32
+    selfContainedRoom:
+     type: boolean
+  Address:
+   type: object
+   properties:
+    addressLine1:
+     type: string
+    addressLine2:
+     type: string
+    city:
+     type: string
+    state:
+     type: string
+     description: region for E.African countries. For Example Mwanza
+    zip:
+     type: string
+     description: NA for E. Africa region
+    country:
+     type: string
+  Login:
+   type: object
+   properties:
+    userName:
+     type: string
+    password:
+     type: string
+
+### Customer POST,PUT on Prefererences including payment
+### Access properties by customer
