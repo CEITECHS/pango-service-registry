@@ -3,7 +3,7 @@ swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "0.0.1"
+  version: "0.0.2"
   title: Pango API
   description: Move you App forwad with Pango API
   # The Domain of Service
@@ -26,6 +26,11 @@ paths:
           in: header
           type: string
           description: user access token
+          required: false
+        - name: customerReferenceId
+          in: header
+          type: string
+          description: logged in customer reference identifier
           required: false
         - name: latitude
           in: query
@@ -102,6 +107,11 @@ paths:
          type: string
          description: user access token
          required: true
+       - name: customerReferenceId
+         in: header
+         type: string
+         description: logged in customer reference identifier
+         required: true
        tags:
        - Property
        responses:
@@ -117,8 +127,7 @@ paths:
     post:
      summary: Creates a new Enquiry to the landlord about Pango based property
      description: |
-        The Enquiries endpoint to create a new Enquiry about  a Pango based property, that will
-          subsequently notify the landloards about this new intent about their properties
+        The Enquiries endpoint to create a new Enquiry about a Pango based property, that will subsequently notify the landlords about this new intent about their properties
      tags:
       - Enquiry
      consumes:
@@ -128,6 +137,11 @@ paths:
         in: header
         type: string
         description: user access token
+        required: true
+      - name: customerReferenceId
+        in: header
+        type: string
+        description: logged in customer reference identifier
         required: true
       - name: propertyReferenceId
         in: path
@@ -160,7 +174,11 @@ paths:
          in: header
          required: true
          type: string
-       - name: landloardIndicator
+       - name: customerReferenceId
+         in: header
+         type: string
+         required: true
+       - name: landlordIndicator
          in: query
          type: boolean
          default: false
@@ -182,17 +200,21 @@ paths:
         - Enquiry
        summary: Enquiries history
        description: |
-          The endpoint returns information about  the Enquiries made by the user to different *Pango* properties when accessed by pontential tenants or Enquiries to *Pango* properties owned by the user when accessed by landloards. The response include some details about the rental property(grouped by) and enquiries to it,  in the proper display order of relevance.
+          The endpoint returns information about  the Enquiries made by the user to different *Pango* properties when accessed by pontential tenants or Enquiries to *Pango* properties owned by the user when accessed by landlords. The response include some details about the rental property(grouped by) and enquiries to it,  in the proper display order of relevance.
        parameters:
         - name: user-token
           in: header
           type: string
           required: true
-        - name: landloardIndicator
+        - name: customerReferenceId
+          in: header
+          type: string
+          required: true
+        - name: landlordIndicator
           in: query
           type: boolean
           default: false
-          description: Relevance access indicator, whether it's being accessed by landloard or potential tenant
+          description: Relevance access indicator, whether it's being accessed by landlord or potential tenant
        responses:
          200:
            description: An an Array of Enquiries grouped by properties
@@ -204,11 +226,9 @@ paths:
            description: An error with a status code between 4XX and 5XX
            schema:
              $ref: "#/definitions/Error"
-
-
   /properties/enquiries/{enquiryReferenceId}:
     put:
-     summary: Updates an existing Enquiry  with correspondence from either the potential tenant or the londlord
+     summary: Updates an existing Enquiry  with correspondence from either the potential tenant or the landlord
      tags:
       - Enquiry
       - Correspondence
@@ -216,6 +236,10 @@ paths:
       - application/json
      parameters:
       - name: user-token
+        in: header
+        type: string
+        required: true
+      - name: customerReferenceId
         in: header
         type: string
         required: true
@@ -250,6 +274,10 @@ paths:
         in: header
         required: true
         type: string
+      - name: customerReferenceId
+        in: header
+        type: string
+        required: true
      responses:
        200:
          description: detailed Enquiry with it's responses
@@ -259,20 +287,20 @@ paths:
          description: An error with a status code between  4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /signUp:
+  /signup:
     post:
      tags:
        - Registration
      consumes:
        - application/json
-     summary: Creates a new  Pango user.
-     description:  An endpoint for creating a new Pango user,  an email with verification link send to the registed email
+     summary: Creates a new Pango user.
+     description:  An endpoint for creating a new Pango user, an email with verification link will be sent to the registered email address
      parameters:
        - name: body
          in: body
          required: true
          schema:
-          $ref: "#/definitions/Customer"
+          $ref: "#/definitions/Signup"
      responses:
        201:
         description: Ok, User resgistered, sent  varification email
@@ -286,9 +314,9 @@ paths:
       - Login
      consumes:
       - application/json
-     summary: Authenticate user by username and password
+     summary: Authenticate user by emailAddress and password
      description: |
-        An endpoint for authenticate a pango user with supplied userName and password, an expiring access token is returned alongise the username as well the customerReferenceId
+        An endpoint for authenticate a pango user with supplied emailAddress and password, an expiring access token is returned along side the firstname, lastname as well the customerReferenceId
      parameters:
       - name: body
         in: body
@@ -301,9 +329,12 @@ paths:
         schema:
          type: object
          properties:
-          userName:
+          firstName:
            type: string
-           description: logged in username
+           description: logged in user's first name
+          lastName:
+           type: string
+           description: logged in user's last name
           customerReferenceId:
            type: string
            description: to be used in subsequent api calls
@@ -496,6 +527,8 @@ definitions:
      type: string
      format: "YYYY-MM-DDThh:mm:ssTZD"
      description: The Enquiry date and time of the enquiry
+    enquiredBy:
+     $ref: "#/definitions/Customer"
     correspondenceCount:
      type: integer
      format: int32
@@ -616,10 +649,31 @@ definitions:
      $ref: "#/definitions/Address"
     profile:
      $ref: "#/definitions/CustomerProfile"
+  Signup:
+   type: object
+   properties:
+    firstName:
+     type: string
+    lastName:
+     type: string
+    phoneNumber:
+     type: string
+    alternatePhoneNumber:
+     type: string
+    emailAddress:
+     type: string
+    alternateEmailAddress:
+     type: string
+    password:
+     type: string
+    profilePicture:
+     type: string
+    address:
+     $ref: "#/definitions/Address"
   CustomerProfile:
    type: object
    properties:
-    userName:
+    emailAddress:
      type: string
     password:
      type: string
@@ -715,7 +769,7 @@ definitions:
   Login:
    type: object
    properties:
-    userName:
+    emailAddress:
      type: string
     password:
      type: string
