@@ -481,6 +481,8 @@ definitions:
   Enquiry:
    type: object
    properties:
+    enquiryReferenceId:
+     type: string
     subject:
      type: string
      description: The subject of this Enquiry. For Example Interested, or Need More Information about this Unit etc
