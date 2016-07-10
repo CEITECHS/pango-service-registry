@@ -373,7 +373,10 @@ paths:
     put:
        summary: Updates a specific rental property unit with the holding details 
        description: |
-         The Property endpoint updates a specific Pango rental property unit with the holding details
+         The Property endpoint updates a specific Pango rental property unit with the holding details. As part of this API the following orchestration will take place
+         1. Calling the tegopesa payment APIs for making a holding payment
+         2. Creating a transaction in customer transaction history and
+         3. Creating a record in unit holding history 
        tags:
        - PropertyUnit
        parameters:
