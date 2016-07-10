@@ -3,7 +3,7 @@ swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "0.0.2"
+  version: "0.0.3"
   title: Pango API
   description: Move you App forwad with Pango API
   # The Domain of Service
@@ -91,6 +91,65 @@ paths:
           description: An error with a status code between  4XX and 5XX
           schema:
             $ref: "#/definitions/Error"
+    post:
+      summary: Create a new property
+      description: This endpoint will create a new property. This property will be in an unverified status till the coordinator verifies it.  
+      tags:
+      - Properties
+      consumes:
+      - application/json
+      parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+           $ref: "#/definitions/Property"
+      responses:
+       201:
+        description: Ok, a new Property created
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"  
+  /properties/list:
+    get:
+      summary: Rental Properties
+      description: |
+        The Properties endpoint returns information about *Pango* rental properties assigned to a coordinator or by the owner. The response includes some details about the rental property and lists the the property in the proper display order by distance.
+      tags:
+      - Properties
+      parameters:
+        - name: user-token
+          in: header
+          type: string
+          description: user access token
+          required: false
+        - name: customerReferenceId
+          in: header
+          type: string
+          description: logged in customer reference identifier
+          required: false
+        - name: referenceId
+          in: query
+          type: string
+          description: coordinator id or the owner Id
+          required: true
+        - name: by
+          in: query
+          type: string
+          description: Group by Owner or Coordinator
+          required: true
+      responses:
+        200:
+          description: An array of rental properties
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Property"
+        default:
+          description: An error with a status code between  4XX and 5XX
+          schema:
+            $ref: "#/definitions/Error"
   /properties/{propertyReferenceId}:
      get:
        summary: A specific rental property
@@ -123,6 +182,200 @@ paths:
           description: An error with a status code between  4XX and 5XX
           schema:
            $ref: "#/definitions/Error"
+     put:
+       summary: Update a specific rental property
+       description: |
+         The Property endpoint updates a specific Pango rental property
+       parameters:
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: true
+       - name: customerReferenceId
+         in: header
+         type: string
+         description: logged in customer reference identifier
+         required: true
+       - name: body
+         in: body
+         description: Updated property 
+         required: true
+         schema: 
+          $ref: "#/definitions/Property"
+       tags:
+       - Property
+       responses:
+         200:
+           description: Ok, property updated successfully
+         default:
+          description: An error with a status code between  4XX and 5XX
+          schema:
+           $ref: "#/definitions/Error"
+  /properties/{propertyReferenceId}/units:
+    post:
+       summary: Create a new rental property unit
+       description: |
+         The Property endpoint creates a new Pango rental property unit
+       tags:
+       - PropertyUnit
+       parameters:
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: true
+       - name: customerReferenceId
+         in: header
+         type: string
+         description: logged in customer reference identifier
+         required: true
+       - name: body
+         in: body
+         description: New property unit
+         required: true
+         schema: 
+          $ref: "#/definitions/PropertyDetail"
+       responses:
+         201:
+           description: The request has been fulfilled and resulted in a new resource being created
+         default:
+           description: An error with a status code between  4XX and 5XX
+           schema:
+            $ref: "#/definitions/Error"
+  /properties/{propertyReferenceId}/units/{unitId}:
+    put:
+       summary: Updates a specific rental property unit
+       description: |
+         The Property endpoint updates a specific Pango rental property unit
+       tags:
+       - PropertyUnit
+       parameters:
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
+       - name: unitId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property unit
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: true
+       - name: customerReferenceId
+         in: header
+         type: string
+         description: logged in customer reference identifier
+         required: true
+       - name: body
+         in: body
+         description: Updated property unit
+         required: true
+         schema: 
+          $ref: "#/definitions/PropertyDetail"
+       responses:
+         200:
+           description: Ok, the Pango rental unit has been updated successfully
+         default:
+           description: An error with a status code between  4XX and 5XX
+           schema:
+            $ref: "#/definitions/Error"
+  /properties/{propertyReferenceId}/units/{unitId}/rent:
+    put:
+       summary: Updates a specific rental property unit with the rental details 
+       description: |
+         The Property endpoint updates a specific Pango rental property unit with the rental details
+       tags:
+       - PropertyUnit
+       parameters:
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
+       - name: unitId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property unit
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: true
+       - name: customerReferenceId
+         in: header
+         type: string
+         description: logged in customer reference identifier
+         required: true
+       - name: body
+         in: body
+         description: Unit rental details
+         required: true
+         schema: 
+          $ref: "#/definitions/UnitRentalHistory"
+       responses:
+         200:
+           description: Ok, the Pango rental unit has been updated successfully with the rental details
+         default:
+           description: An error with a status code between  4XX and 5XX
+           schema:
+            $ref: "#/definitions/Error"
+  /properties/{propertyReferenceId}/units/{unitId}/hold:
+    put:
+       summary: Updates a specific rental property unit with the holding details 
+       description: |
+         The Property endpoint updates a specific Pango rental property unit with the holding details
+       tags:
+       - PropertyUnit
+       parameters:
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
+       - name: unitId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property unit
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: true
+       - name: customerReferenceId
+         in: header
+         type: string
+         description: logged in customer reference identifier
+         required: true
+       - name: body
+         in: body
+         description: Unit holding details
+         required: true
+         schema: 
+          $ref: "#/definitions/UnitHoldingHistory"
+       responses:
+         200:
+           description: Ok, the Pango rental unit has been updated successfully with the holding details
+         default:
+           description: An error with a status code between  4XX and 5XX
+           schema:
+            $ref: "#/definitions/Error"
   /properties/{propertyReferenceId}/enquiries:
     post:
      summary: Creates a new Enquiry to the landlord about Pango based property
@@ -287,10 +540,11 @@ paths:
          description: An error with a status code between  4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /signup:
+  /users:
     post:
      tags:
        - Registration
+       - User
      consumes:
        - application/json
      summary: Creates a new Pango user.
@@ -300,10 +554,153 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/Signup"
+          $ref: "#/definitions/User"
      responses:
        201:
         description: Ok, User resgistered, sent  varification email
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
+  /users/{userReferenceId}:
+    put:
+     tags:
+       - User
+     consumes:
+       - application/json
+     summary: Updates an existing user
+     description:  An endpoint for updating an existing Pango User
+     parameters:
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
+       - name: body
+         in: body
+         required: true
+         schema:
+          $ref: "#/definitions/User"
+     responses:
+       200:
+        description: Ok, User updated
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
+  /users/{userReferenceId}/profile:
+    put:
+     tags:
+       - User
+     consumes:
+       - application/json
+     summary: Updates the profile of an existing user
+     description:  An endpoint for updating the profile of an existing Pango User
+     parameters:
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
+       - name: user-token
+         in: header
+         required: true
+         type: string
+       - name: body
+         in: body
+         required: true
+         schema:
+          $ref: "#/definitions/CustomerProfile"
+     responses:
+       200:
+        description: Ok, User updated
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
+  /users/{userReferenceId}/preferences:
+    post:
+     tags:
+       - CustomerPreference
+     consumes:
+       - application/json
+     summary: Creates a new preference for an existing Pango user
+     description:  An endpoint for creating a new preference for an existing Pango user
+     parameters:
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
+       - name: user-token
+         in: header
+         required: true
+         type: string
+       - name: body
+         in: body
+         required: true
+         schema:
+          $ref: "#/definitions/CustomerPreference"
+     responses:
+       201:
+         description: Ok, successfully created a new customer preference
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
+    get:
+     tags:
+       - CustomerPreference
+     consumes:
+       - application/json
+     summary: gets all the preference for an existing Pango user
+     description:  An endpoint for retrieving all the preferences for an existing Pango user
+     parameters:
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
+       - name: user-token
+         in: header
+         required: true
+         type: string
+     responses:
+       200:
+         description: Ok, successfully retrieved all the preferences
+         schema:
+           type: array
+           items:
+             $ref: "#/definitions/CustomerPreference"       
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"           
+  /users/{userReferenceId}/preferences/{preferenceId}:
+    put:
+     tags:
+       - CustomerPreference
+     consumes:
+       - application/json
+     summary: Updates an existing preference for an existing Pango user
+     description:  An endpoint for updating an existing preference for an existing Pango user
+     parameters:
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
+       - name: user-token
+         in: header
+         required: true
+         type: string
+       - name: preferenceId
+         in: path
+         required: true
+         type: string
+       - name: body
+         in: body
+         required: true
+         schema:
+          $ref: "#/definitions/CustomerPreference"
+     responses:
+       200:
+         description: Ok, successfully updated the preference
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -649,7 +1046,7 @@ definitions:
      $ref: "#/definitions/Address"
     profile:
      $ref: "#/definitions/CustomerProfile"
-  Signup:
+  User:
    type: object
    properties:
     firstName:
@@ -773,6 +1170,36 @@ definitions:
      type: string
     password:
      type: string
+  UnitRentalHistory:
+   type: object
+   properties:
+    rentalReferenceId:
+      type: string
+    propertyUnit:
+      $ref: "#/definitions/PropertyDetail"
+    customer:
+      $ref: "#/definitions/Customer"      
+    startDate:
+      type: string
+      format: YYYY-MM-DD
+    endDate:
+      type: string
+      format: YYYY-MM_DD
+  UnitHoldingHistory:
+   type: object
+   properties:
+    holdingReferenceId:
+      type: string
+    propertyUnit:
+      $ref: "#/definitions/PropertyDetail"
+    customer:
+      $ref: "#/definitions/Customer"      
+    startDate:
+      type: string
+      format: YYYY-MM-DD
+    endDate:
+      type: string
+      format: YYYY-MM_DD
 
 ### Customer POST,PUT on Prefererences including payment
 ### Access properties by customer
