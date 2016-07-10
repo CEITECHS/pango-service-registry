@@ -3,7 +3,7 @@ swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "0.0.3"
+  version: "0.0.5"
   title: Pango API
   description: Move you App forwad with Pango API
   # The Domain of Service
@@ -113,9 +113,43 @@ paths:
            $ref: "#/definitions/Error"  
   /properties/list:
     get:
+       summary: Get a list of rental property unit rented or held by a Pango customer
+       description: |
+         The Property endpoint will return a list of Pango rental property unit by status as specified in the query parameter
+       tags:
+       - Properties
+       parameters:
+       - name: status
+         in: query
+         required: true
+         type: string
+         description: Status - "RENT" or "ON-HOLD"
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: true
+       - name: customerReferenceId
+         in: header
+         type: string
+         description: logged in customer reference identifier
+         required: true
+       responses:
+         200:
+           description: List of Pango rental units assigned to the customer filtered as per the status
+           schema:
+            type: array
+            items:
+              $ref: "#/definitions/PropertyDetail" 
+         default:
+           description: An error with a status code between  4XX and 5XX
+           schema:
+            $ref: "#/definitions/Error"           
+  /properties/pending/list:
+    get:
       summary: Rental Properties
       description: |
-        The Properties endpoint returns information about *Pango* rental properties assigned to a coordinator or by the owner. The response includes some details about the rental property and lists the the property in the proper display order by distance.
+        The Properties endpoint returns information about *Pango* rental properties that have not been verified. The properties can be grouped by a coordinator or by the owner. 
       tags:
       - Properties
       parameters:
