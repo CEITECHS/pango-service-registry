@@ -3,7 +3,7 @@ swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "0.0.6"
+  version: "0.0.7"
   title: Pango API
   description: Move you App forwad with Pango API
   # The Domain of Service
@@ -113,9 +113,9 @@ paths:
            $ref: "#/definitions/Error"  
   /properties/list:
     get:
-       summary: Get a list of rental property unit rented or held by a Pango customer
+       summary: Get a list of active rental property unit rented or held by a Pango customer
        description: |
-         The Property endpoint will return a list of Pango rental property unit by status as specified in the query parameter
+         The Property endpoint will return a list of active Pango rental property unit by status as specified in the query parameter
        tags:
        - Properties
        parameters:
@@ -211,7 +211,7 @@ paths:
          200:
            description: Detailed information of the property
            schema:
-            $ref: "#/definitions/PropertyDetail"
+            $ref: "#/definitions/Property"
          default:
           description: An error with a status code between  4XX and 5XX
           schema:
@@ -287,6 +287,39 @@ paths:
            description: An error with a status code between  4XX and 5XX
            schema:
             $ref: "#/definitions/Error"
+    get:
+       summary: Return a list of rental property unit
+       description: |
+         This endpoint return a list of rental property unit for a particular property
+       tags:
+       - PropertyUnit
+       parameters:
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: true
+       - name: userReferenceId
+         in: header
+         type: string
+         description: logged in user reference identifier
+         required: true
+       responses:
+         200:
+           description: The request has been fulfilled and resulted in a new resource being created
+           schema:
+            type: array
+            items:
+              $ref: "#/definitions/PropertyDetail"
+         default:
+           description: An error with a status code between  4XX and 5XX
+           schema:
+            $ref: "#/definitions/Error"      
   /properties/{propertyReferenceId}/units/{unitId}:
     put:
        summary: Updates a specific rental property unit
@@ -368,6 +401,11 @@ paths:
          description: End Date of the rental property
          required: true
          type: string
+       - name: body
+         in: body
+         required: true
+         schema:
+          $ref: "#/definitions/UserRentRequest"
        responses:
          200:
            description: Ok, the Pango rental unit has been updated successfully with the rental details
@@ -824,7 +862,7 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /rentals/{rentalReferenceID}/reviews:
+  /rentals/{rentalReferenceId}/reviews:
     post:
      tags:
       - Reviews
@@ -846,7 +884,7 @@ paths:
          in: query
          required: true
          type: string
-       - name: rentalReferenceID
+       - name: rentalReferenceId
          in: path
          required: true
          type: string
@@ -937,6 +975,8 @@ definitions:
   Property:
    type: object
    properties:
+     propertyReferenceId:
+      type: string
      purpose:
       type: string
       description: Information indicating what this property is good for, For Example. Home or Business
@@ -1259,6 +1299,19 @@ definitions:
      type: string
     address:
      $ref: "#/definitions/Address"
+  UserRentRequest:
+   type: object
+   properties:
+    firstName:
+     type: string
+    lastName:
+     type: string
+    phoneNumber:
+     type: string
+    emailAddress:
+     type: string
+    address:
+     $ref: "#/definitions/Address"
   UserProfile:
    type: object
    properties:
@@ -1268,17 +1321,7 @@ definitions:
      type: string
     profilePicture:
      $ref: "#/definitions/Attachment"
-    verified:
-     type: boolean
-    verificationCode:
-     type: string
-    verificationDate:
-     type: string
-     format: YYY-MM-DD
-    joinedDate:
-     type: string
-     format: YYYY-MM-DD
-    serachHistory:
+    searchHistory:
       type: array
       items:
        $ref: "#/definitions/SearchCriteria"
@@ -1300,11 +1343,6 @@ definitions:
     active:
      type: boolean
      description: status display or if set to false will diactivate preference
-    paid:
-     type: boolean
-    paidOn:
-     type: string
-     format: YYYY-MM-DD
     notify:
      type: boolean
     notifyOnCriteria:
