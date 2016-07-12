@@ -27,10 +27,10 @@ paths:
           type: string
           description: user access token
           required: false
-        - name: customerReferenceId
+        - name: userReferenceId
           in: header
           type: string
-          description: logged in customer reference identifier
+          description: logged in user reference identifier
           required: false
         - name: latitude
           in: query
@@ -129,10 +129,10 @@ paths:
          type: string
          description: user access token
          required: true
-       - name: customerReferenceId
+       - name: userReferenceId
          in: header
          type: string
-         description: logged in customer reference identifier
+         description: logged in user reference identifier
          required: true
        responses:
          200:
@@ -158,10 +158,10 @@ paths:
           type: string
           description: user access token
           required: false
-        - name: customerReferenceId
+        - name: userReferenceId
           in: header
           type: string
-          description: logged in customer reference identifier
+          description: logged in user reference identifier
           required: false
         - name: referenceId
           in: query
@@ -200,10 +200,10 @@ paths:
          type: string
          description: user access token
          required: true
-       - name: customerReferenceId
+       - name: userReferenceId
          in: header
          type: string
-         description: logged in customer reference identifier
+         description: logged in user reference identifier
          required: true
        tags:
        - Property
@@ -231,10 +231,10 @@ paths:
          type: string
          description: user access token
          required: true
-       - name: customerReferenceId
+       - name: userReferenceId
          in: header
          type: string
-         description: logged in customer reference identifier
+         description: logged in user reference identifier
          required: true
        - name: body
          in: body
@@ -269,10 +269,10 @@ paths:
          type: string
          description: user access token
          required: true
-       - name: customerReferenceId
+       - name: userReferenceId
          in: header
          type: string
-         description: logged in customer reference identifier
+         description: logged in user reference identifier
          required: true
        - name: body
          in: body
@@ -310,10 +310,10 @@ paths:
          type: string
          description: user access token
          required: true
-       - name: customerReferenceId
+       - name: userReferenceId
          in: header
          type: string
-         description: logged in customer reference identifier
+         description: logged in user reference identifier
          required: true
        - name: body
          in: body
@@ -335,6 +335,8 @@ paths:
          The Property endpoint updates a specific Pango rental property unit with the rental details
        tags:
        - PropertyUnit
+       - Renting PropertyUnit
+       - User Transaction
        parameters:
        - name: propertyReferenceId
          in: path
@@ -351,17 +353,21 @@ paths:
          type: string
          description: user access token
          required: true
-       - name: customerReferenceId
+       - name: userReferenceId
          in: header
          type: string
-         description: logged in customer reference identifier
+         description: logged in user reference identifier
          required: true
-       - name: body
-         in: body
-         description: Unit rental details
+       - name: startDate
+         in: query
+         description: Start Date of the rental property
          required: true
-         schema: 
-          $ref: "#/definitions/UnitRentalHistory"
+         type: string
+       - name: endDate
+         in: query
+         description: End Date of the rental property
+         required: true
+         type: string
        responses:
          200:
            description: Ok, the Pango rental unit has been updated successfully with the rental details
@@ -380,7 +386,7 @@ paths:
        tags:
        - PropertyUnit
        - Holding PropertyUnit
-       - Customer Transaction
+       - User Transaction
        parameters:
        - name: propertyReferenceId
          in: path
@@ -397,17 +403,21 @@ paths:
          type: string
          description: user access token
          required: true
-       - name: customerReferenceId
+       - name: userReferenceId
          in: header
          type: string
-         description: logged in customer reference identifier
+         description: logged in user reference identifier
          required: true
-       - name: body
-         in: body
-         description: Unit holding details
+       - name: startDate
+         in: query
+         description: Start Date of the rental property
          required: true
-         schema: 
-          $ref: "#/definitions/UnitHoldingHistory"
+         type: string
+       - name: endDate
+         in: query
+         description: End Date of the rental property
+         required: true
+         type: string
        responses:
          200:
            description: Ok, the Pango rental unit has been updated successfully with the holding details
@@ -430,10 +440,10 @@ paths:
         type: string
         description: user access token
         required: true
-      - name: customerReferenceId
+      - name: userReferenceId
         in: header
         type: string
-        description: logged in customer reference identifier
+        description: logged in user reference identifier
         required: true
       - name: propertyReferenceId
         in: path
@@ -466,7 +476,7 @@ paths:
          in: header
          required: true
          type: string
-       - name: customerReferenceId
+       - name: userReferenceId
          in: header
          type: string
          required: true
@@ -498,7 +508,7 @@ paths:
           in: header
           type: string
           required: true
-        - name: customerReferenceId
+        - name: userReferenceId
           in: header
           type: string
           required: true
@@ -531,7 +541,7 @@ paths:
         in: header
         type: string
         required: true
-      - name: customerReferenceId
+      - name: userReferenceId
         in: header
         type: string
         required: true
@@ -566,7 +576,7 @@ paths:
         in: header
         required: true
         type: string
-      - name: customerReferenceId
+      - name: userReferenceId
         in: header
         type: string
         required: true
@@ -593,10 +603,10 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/User"
+          $ref: "#/definitions/UserRequest"
      responses:
        201:
-        description: Ok, User resgistered, sent  varification email
+        description: Ok, User resgistered, sent verification email
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -618,7 +628,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/User"
+          $ref: "#/definitions/UserRequest"
      responses:
        200:
         description: Ok, User updated
@@ -647,7 +657,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/CustomerProfile"
+          $ref: "#/definitions/UserProfile"
      responses:
        200:
         description: Ok, User updated
@@ -658,7 +668,7 @@ paths:
   /users/{userReferenceId}/preferences:
     post:
      tags:
-       - CustomerPreference
+       - UserPreference
      consumes:
        - application/json
      summary: Creates a new preference for an existing Pango user
@@ -676,7 +686,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/CustomerPreference"
+          $ref: "#/definitions/UserPreferenceRequest"
      responses:
        201:
          description: Ok, successfully created a new customer preference
@@ -686,7 +696,7 @@ paths:
            $ref: "#/definitions/Error"
     get:
      tags:
-       - CustomerPreference
+       - UserPreference
      consumes:
        - application/json
      summary: gets all the preference for an existing Pango user
@@ -706,7 +716,7 @@ paths:
          schema:
            type: array
            items:
-             $ref: "#/definitions/CustomerPreference"       
+             $ref: "#/definitions/UserPreferenceResponse"       
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -714,7 +724,7 @@ paths:
   /users/{userReferenceId}/preferences/{preferenceId}:
     put:
      tags:
-       - CustomerPreference
+       - UserPreference
      consumes:
        - application/json
      summary: Updates an existing preference for an existing Pango user
@@ -736,7 +746,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/CustomerPreference"
+          $ref: "#/definitions/UserPreferenceRequest"
      responses:
        200:
          description: Ok, successfully updated the preference
@@ -752,7 +762,7 @@ paths:
       - application/json
      summary: Authenticate user by emailAddress and password
      description: |
-        An endpoint for authenticate a pango user with supplied emailAddress and password, an expiring access token is returned along side the firstname, lastname as well the customerReferenceId
+        An endpoint for authenticate a pango user with supplied emailAddress and password, an expiring access token is returned along side the firstname, lastname as well the userReferenceId
      parameters:
       - name: body
         in: body
@@ -761,7 +771,7 @@ paths:
          $ref: "#/definitions/Login"
      responses:
        200:
-        description: access-token , customerReferenceId and username
+        description: access-token , userReferenceId and username
         schema:
          type: object
          properties:
@@ -771,7 +781,7 @@ paths:
           lastName:
            type: string
            description: logged in user's last name
-          customerReferenceId:
+          userReferenceId:
            type: string
            description: to be used in subsequent api calls
           access-token:
@@ -781,7 +791,7 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /rentals/{userReferenceId}:
+  /rentals:
     get:
      tags:
       - Rentals
@@ -792,7 +802,7 @@ paths:
         An endpoint that returns the rental history of the owner or the customer as specified in the 'by' query parameter
      parameters:
        - name: userReferenceId
-         in: path
+         in: header
          type: string
          required: true
        - name: user-token
@@ -844,7 +854,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/Review"
+          $ref: "#/definitions/ReviewRequest"
      responses:
        201:
         description: Ok, successfully created a new review
@@ -884,7 +894,7 @@ paths:
         schema:
          type: array
          items:
-          $ref : "#/definitions/Review"
+          $ref : "#/definitions/ReviewResponse"
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -915,7 +925,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/Review"
+          $ref: "#/definitions/ReviewRequest"
      responses:
        200:
         description: Ok, the review was updated successfully
@@ -1105,7 +1115,7 @@ definitions:
      format: "YYYY-MM-DDThh:mm:ssTZD"
      description: The Enquiry date and time of the enquiry
     enquiredBy:
-     $ref: "#/definitions/Customer"
+     $ref: "#/definitions/UserResponse"
     correspondenceCount:
      type: integer
      format: int32
@@ -1207,9 +1217,11 @@ definitions:
        type: string
      fields:
       type: string
-  Customer:
+  UserResponse:
    type: object
    properties:
+    userReferenceId:
+      type: string
     firstName:
      type: string
     lastName:
@@ -1225,8 +1237,8 @@ definitions:
     address:
      $ref: "#/definitions/Address"
     profile:
-     $ref: "#/definitions/CustomerProfile"
-  User:
+     $ref: "#/definitions/UserProfile"
+  UserRequest:
    type: object
    properties:
     firstName:
@@ -1247,7 +1259,7 @@ definitions:
      type: string
     address:
      $ref: "#/definitions/Address"
-  CustomerProfile:
+  UserProfile:
    type: object
    properties:
     emailAddress:
@@ -1270,11 +1282,9 @@ definitions:
       type: array
       items:
        $ref: "#/definitions/SearchCriteria"
-  CustomerPreference:
+  UserPreferenceRequest:
    type: object
    properties:
-    customerReferenceId:
-     type: string
     preferenceType:
      type: string
      description: reason for this preference. For Example. Notification
@@ -1290,6 +1300,35 @@ definitions:
     active:
      type: boolean
      description: status display or if set to false will diactivate preference
+    paid:
+     type: boolean
+    paidOn:
+     type: string
+     format: YYYY-MM-DD
+    notify:
+     type: boolean
+    notifyOnCriteria:
+     $ref: "#/definitions/SearchCriteria"
+  UserPreferenceResponse:
+   type: object
+   properties:
+    userPreferenceId:
+     type: string
+    preferenceType:
+     type: string
+     description: reason for this preference. For Example. Notification
+    startDate:
+     type: string
+     format: YYYY-MM-DD
+    toDate:
+     type: string
+     format: YYYY-MM-DD
+    forDays:
+     type: integer
+     format: int32
+    active:
+     type: boolean
+     description: status display or if set to false will deactivate preference
     paid:
      type: boolean
     paidOn:
@@ -1357,8 +1396,8 @@ definitions:
       type: string
     propertyUnit:
       $ref: "#/definitions/PropertyDetail"
-    customer:
-      $ref: "#/definitions/Customer"      
+    user:
+      $ref: "#/definitions/UserResponse"      
     startDate:
       type: string
       format: YYYY-MM-DD
@@ -1372,15 +1411,33 @@ definitions:
       type: string
     propertyUnit:
       $ref: "#/definitions/PropertyDetail"
-    customer:
-      $ref: "#/definitions/Customer"      
+    user:
+      $ref: "#/definitions/UserResponse"      
     startDate:
       type: string
       format: YYYY-MM-DD
     endDate:
       type: string
       format: YYYY-MM-DD
-  Review:
+  ReviewRequest:
+    type: object
+    properties:
+      reviewText:
+        type: string
+      reviewedBy:
+        type: string
+      reviewedDate:
+        type: string
+        format: YYYY-MM-DD
+      recommend:
+        type: string
+      rating:
+        type: string
+      userReferenceId:
+        type: string
+      propertyReferenceId:
+        type: string
+  ReviewResponse:
     type: object
     properties:
       reviewId:
@@ -1396,7 +1453,7 @@ definitions:
         type: string
       rating:
         type: string
-      customer:
-        $ref: "#/definitions/Customer"
+      user:
+        $ref: "#/definitions/UserResponse"
       propertyUnit:
-        $ref: "#/definitions/PropertyDetail"
+        $ref: "#/definitions/PropertyDetail"        
