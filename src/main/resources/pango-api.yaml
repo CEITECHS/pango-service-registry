@@ -1045,6 +1045,11 @@ definitions:
       type: integer
       format: int32
       description : Total number of tenant reviews on this property to date
+     propertyAmenities:
+      type: array
+      description: features to better describe this property. For Example  Air Conditioning, Ceiling Fans, Cable Ready, Washer/Dryer etc
+      items:
+       $ref: "#/definitions/Amenity"
      photoUrl:
        $ref: "#/definitions/Attachment"
      distance:
@@ -1112,16 +1117,11 @@ definitions:
      rentalPeriod:
       type: string
       description: Lease Length. For Example 12 Month Lease
-     generalFeatures:
+     propertyAmenities:
       type: array
-      description: General features of the property compaund. For Example Fitness Center, Pool, Garden, Controlled Access etc
+      description: features to better describe this property. For Example  Air Conditioning, Ceiling Fans, Cable Ready, Washer/Dryer etc
       items:
-       type: string
-     propertyFeatures:
-      type: array
-      description: Additional features to better describe this property. For Example  Air Conditioning, Ceiling Fans, Cable Ready, Washer/Dryer etc
-      items:
-       type: string
+       $ref: "#/definitions/Amenity"
      rating:
       type: integer
       format: int32
@@ -1164,7 +1164,7 @@ definitions:
      description: Detailed message to the landlord inticating the intentions and expected responses. For Example. I`m interested in this property and I would like you to schedule me up for site visit as soon as possible
     enquiredOn:
      type: string
-     format: "YYYY-MM-DDThh:mm:ssTZD"
+     format: "YYYY-MM-ddThh:mm:ssTZD"
      description: The Enquiry date and time of the enquiry
     enquiredBy:
      $ref: "#/definitions/UserResponse"
@@ -1345,10 +1345,10 @@ definitions:
      description: reason for this preference. For Example. Notification
     startDate:
      type: string
-     format: YYYY-MM-DD
+     format: YYYY-MM-dd
     toDate:
      type: string
-     format: YYYY-MM-DD
+     format: YYYY-MM-dd
     forDays:
      type: integer
      format: int32
@@ -1369,10 +1369,10 @@ definitions:
      description: reason for this preference. For Example. Notification
     startDate:
      type: string
-     format: YYYY-MM-DD
+     format: YYYY-MM-dd
     toDate:
      type: string
-     format: YYYY-MM-DD
+     format: YYYY-MM-dd
     forDays:
      type: integer
      format: int32
@@ -1383,7 +1383,7 @@ definitions:
      type: boolean
     paidOn:
      type: string
-     format: YYYY-MM-DD
+     format: YYYY-MM-dd
     notify:
      type: boolean
     notifyOnCriteria:
@@ -1393,7 +1393,7 @@ definitions:
    properties:
     searchDate:
      type: string
-     format: "YYYY-MM-DDThh:mm:ssTZD"
+     format: "YYYY-MM-ddThh:mm:ssTZD"
     longitude:
      type: number
      format: double
@@ -1415,6 +1415,14 @@ definitions:
      format: int32
     selfContainedRoom:
      type: boolean
+    minPrice:
+     type: number
+     format: double
+    maxPrice:
+     type: number
+     format: double
+    features:
+     type: string
   Address:
    type: object
    properties:
@@ -1447,7 +1455,7 @@ definitions:
     propertyUnit:
       $ref: "#/definitions/PropertyDetail"
     user:
-      $ref: "#/definitions/UserResponse"      
+      $ref: "#/definitions/UserResponse"
     startDate:
       type: string
       format: YYYY-MM-DD
@@ -1462,7 +1470,7 @@ definitions:
     propertyUnit:
       $ref: "#/definitions/PropertyDetail"
     user:
-      $ref: "#/definitions/UserResponse"      
+      $ref: "#/definitions/UserResponse"
     startDate:
       type: string
       format: YYYY-MM-DD
@@ -1506,4 +1514,11 @@ definitions:
       user:
         $ref: "#/definitions/UserResponse"
       propertyUnit:
-        $ref: "#/definitions/PropertyDetail"        
+        $ref: "#/definitions/PropertyDetail"
+  Amenity:
+     type: object
+     properties:
+       amenityName:
+         type: string
+       amenityAvailable:
+         type: boolean
