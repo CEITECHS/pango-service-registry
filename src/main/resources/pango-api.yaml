@@ -85,6 +85,11 @@ paths:
           format: double
           default: 0
           description: indicating maximum rental price per month
+        - name: features
+          in: query
+          description: A comma separated string of featutes. Ex. Air Condition, Swimming Pool, Laundry
+          required: false
+          type: string
       tags:
       - Properties
       responses:
