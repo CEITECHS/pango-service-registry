@@ -59,25 +59,32 @@ paths:
           in: query
           type: string
           required: true
-          format: "YYYY-MM-DD|YYYY-MM-DD"
-          description: The expected moving in date range, from and to date sepearted by | operator
+          format: "YYYY-MM-dd"
+          description: The expected moving in date
         - name: roomsCount
           in: query
           type: integer
           format: int32
           default: 1
-          description: indicating properties should contain this rooms count
+          description: indicating properties should contain this rooms count, primariry for Business
         - name: bedRoomsCount
           in: query
-          type: integer
-          format: int32
+          type: number
+          format: double
           default: 0
-          description: indicating properties should contain this bedrooms count
-        - name: selfContainedRooms
+          description: indicating properties should contain this number bedrooms count or 0.5 for studio property, primariry for Homes
+        - name: minPrice
           in: query
-          type: boolean
-          default: false
-          description: indicating properties must contain at least a self contained room
+          type: number
+          format: double
+          default: 0
+          description: indicating minimun rental price per month
+        - name: maxPrice
+          in: query
+          type: number
+          format: double
+          default: 0
+          description: indicating maximum rental price per month
       tags:
       - Properties
       responses:
