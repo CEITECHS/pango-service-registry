@@ -3,7 +3,7 @@ swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "0.0.7"
+  version: "0.0.8"
   title: Pango API
   description: Move you App forwad with Pango API
   # The Domain of Service
@@ -98,7 +98,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Property"
+              $ref: "#/definitions/PropertyResource"
         default:
           description: An error with a status code between  4XX and 5XX
           schema:
@@ -115,7 +115,7 @@ paths:
         in: body
         required: true
         schema:
-           $ref: "#/definitions/Property"
+           $ref: "#/definitions/PropertyDetailResource"
       responses:
        201:
         description: Ok, a new Property created
@@ -131,11 +131,6 @@ paths:
        tags:
        - Properties
        parameters:
-       - name: status
-         in: query
-         required: true
-         type: string
-         description: Status - "RENT" or "ON-HOLD"
        - name: user-token
          in: header
          type: string
@@ -146,13 +141,23 @@ paths:
          type: string
          description: logged in user reference identifier
          required: true
+       - name: status
+         in: query
+         required: true
+         type: string
+         description: Status - "RENT" or "ON-HOLD"
+       - name: landlordIndicator
+         in: query
+         required: true
+         type: boolean
+         description: Landlord indicator 
        responses:
          200:
            description: List of Pango rental units assigned to the customer filtered as per the status
            schema:
             type: array
             items:
-              $ref: "#/definitions/PropertyDetail" 
+              $ref: "#/definitions/PropertyResource" 
          default:
            description: An error with a status code between  4XX and 5XX
            schema:
@@ -169,21 +174,21 @@ paths:
           in: header
           type: string
           description: user access token
-          required: false
+          required: true
         - name: userReferenceId
           in: header
           type: string
           description: logged in user reference identifier
-          required: false
+          required: true
         - name: referenceId
           in: query
           type: string
           description: coordinator id or the owner Id
           required: true
-        - name: by
+        - name: landlordIndicator
           in: query
-          type: string
-          description: Group by Owner or Coordinator
+          type: boolean
+          description: Landlord indicator to differentiate between owner and landlord
           required: true
       responses:
         200:
@@ -191,7 +196,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Property"
+              $ref: "#/definitions/PropertyResource"
         default:
           description: An error with a status code between  4XX and 5XX
           schema:
@@ -202,11 +207,6 @@ paths:
        description: |
          The Property endpoint returns detailed information of a specific Pango rental property
        parameters:
-       - name: propertyReferenceId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property
        - name: user-token
          in: header
          type: string
@@ -217,13 +217,18 @@ paths:
          type: string
          description: logged in user reference identifier
          required: true
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
        tags:
        - Property
        responses:
          200:
            description: Detailed information of the property
            schema:
-            $ref: "#/definitions/Property"
+            $ref: "#/definitions/PropertyDetailResource"
          default:
           description: An error with a status code between  4XX and 5XX
           schema:
@@ -233,11 +238,6 @@ paths:
        description: |
          The Property endpoint updates a specific Pango rental property
        parameters:
-       - name: propertyReferenceId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property
        - name: user-token
          in: header
          type: string
@@ -248,12 +248,17 @@ paths:
          type: string
          description: logged in user reference identifier
          required: true
+       - name: propertyReferenceId
+         in: path
+         required: true
+         type: string
+         description: Unique identifier representing a specific Pango rental property
        - name: body
          in: body
          description: Updated property 
          required: true
          schema: 
-          $ref: "#/definitions/Property"
+          $ref: "#/definitions/PropertyDetailResource"
        tags:
        - Property
        responses:
@@ -263,117 +268,7 @@ paths:
           description: An error with a status code between  4XX and 5XX
           schema:
            $ref: "#/definitions/Error"
-  /properties/{propertyReferenceId}/units:
-    post:
-       summary: Create a new rental property unit
-       description: |
-         The Property endpoint creates a new Pango rental property unit
-       tags:
-       - PropertyUnit
-       parameters:
-       - name: propertyReferenceId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property
-       - name: user-token
-         in: header
-         type: string
-         description: user access token
-         required: true
-       - name: userReferenceId
-         in: header
-         type: string
-         description: logged in user reference identifier
-         required: true
-       - name: body
-         in: body
-         description: New property unit
-         required: true
-         schema: 
-          $ref: "#/definitions/PropertyDetail"
-       responses:
-         201:
-           description: The request has been fulfilled and resulted in a new resource being created
-         default:
-           description: An error with a status code between  4XX and 5XX
-           schema:
-            $ref: "#/definitions/Error"
-    get:
-       summary: Return a list of rental property unit
-       description: |
-         This endpoint return a list of rental property unit for a particular property
-       tags:
-       - PropertyUnit
-       parameters:
-       - name: propertyReferenceId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property
-       - name: user-token
-         in: header
-         type: string
-         description: user access token
-         required: true
-       - name: userReferenceId
-         in: header
-         type: string
-         description: logged in user reference identifier
-         required: true
-       responses:
-         200:
-           description: The request has been fulfilled and resulted in a new resource being created
-           schema:
-            type: array
-            items:
-              $ref: "#/definitions/PropertyDetail"
-         default:
-           description: An error with a status code between  4XX and 5XX
-           schema:
-            $ref: "#/definitions/Error"      
-  /properties/{propertyReferenceId}/units/{unitId}:
-    put:
-       summary: Updates a specific rental property unit
-       description: |
-         The Property endpoint updates a specific Pango rental property unit
-       tags:
-       - PropertyUnit
-       parameters:
-       - name: propertyReferenceId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property
-       - name: unitId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property unit
-       - name: user-token
-         in: header
-         type: string
-         description: user access token
-         required: true
-       - name: userReferenceId
-         in: header
-         type: string
-         description: logged in user reference identifier
-         required: true
-       - name: body
-         in: body
-         description: Updated property unit
-         required: true
-         schema: 
-          $ref: "#/definitions/PropertyDetail"
-       responses:
-         200:
-           description: Ok, the Pango rental unit has been updated successfully
-         default:
-           description: An error with a status code between  4XX and 5XX
-           schema:
-            $ref: "#/definitions/Error"
-  /properties/{propertyReferenceId}/units/{unitId}/rent:
+  /properties/{propertyReferenceId}/rent:
     put:
        summary: Updates a specific rental property unit with the rental details 
        description: |
@@ -383,16 +278,6 @@ paths:
        - Renting PropertyUnit
        - User Transaction
        parameters:
-       - name: propertyReferenceId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property
-       - name: unitId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property unit
        - name: user-token
          in: header
          type: string
@@ -403,21 +288,16 @@ paths:
          type: string
          description: logged in user reference identifier
          required: true
-       - name: startDate
-         in: query
-         description: Start Date of the rental property
+       - name: propertyReferenceId
+         in: path
          required: true
          type: string
-       - name: endDate
-         in: query
-         description: End Date of the rental property
-         required: true
-         type: string
+         description: Unique identifier representing a specific Pango rental property
        - name: body
          in: body
          required: true
          schema:
-          $ref: "#/definitions/UserRentRequest"
+          $ref: "#/definitions/UserRentResource"
        responses:
          200:
            description: Ok, the Pango rental unit has been updated successfully with the rental details
@@ -425,7 +305,7 @@ paths:
            description: An error with a status code between  4XX and 5XX
            schema:
             $ref: "#/definitions/Error"
-  /properties/{propertyReferenceId}/units/{unitId}/hold:
+  /properties/{propertyReferenceId}/hold:
     put:
        summary: Updates a specific rental property unit with the holding details 
        description: |
@@ -438,16 +318,6 @@ paths:
        - Holding PropertyUnit
        - User Transaction
        parameters:
-       - name: propertyReferenceId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property
-       - name: unitId
-         in: path
-         required: true
-         type: string
-         description: Unique identifier representing a specific Pango rental property unit
        - name: user-token
          in: header
          type: string
@@ -458,16 +328,11 @@ paths:
          type: string
          description: logged in user reference identifier
          required: true
-       - name: startDate
-         in: query
-         description: Start Date of the rental property
+       - name: propertyReferenceId
+         in: path
          required: true
          type: string
-       - name: endDate
-         in: query
-         description: End Date of the rental property
-         required: true
-         type: string
+         description: Unique identifier representing a specific Pango rental property
        responses:
          200:
            description: Ok, the Pango rental unit has been updated successfully with the holding details
@@ -503,10 +368,10 @@ paths:
         in: body
         required: true
         schema:
-         $ref: "#/definitions/Enquiry"
+         $ref: "#/definitions/EnquiryResource"
      responses:
        201:
-         description: The request has been fulfilled and resulted in a new resource being created
+         description: The request has been fulfilled and resulted in a new enquiry being created
        default:
         description: An error with a status code between  4XX and 5XX
         schema:
@@ -518,16 +383,16 @@ paths:
       description: |
         This endpoint returns information about enquiries to this property by the current user(potential-tenant) default or All the enquiries made by many potential tenants to this property primariry for the landlord to access.
       parameters:
-       - name: propertyReferenceId
-         in: path
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
        - name: userReferenceId
          in: header
+         type: string
+         required: true
+       - name: propertyReferenceId
+         in: path
          type: string
          required: true
        - name: landlordIndicator
@@ -541,7 +406,7 @@ paths:
          schema:
           type: array
           items:
-            $ref: "#/definitions/Enquiry"
+            $ref: "#/definitions/EnquiryResource"
         default:
           description: An error with a status code between  4XX and 5XX
           schema:
@@ -573,7 +438,7 @@ paths:
            schema:
             type: array
             items:
-             $ref: "#/definitions/PropertyEnquiry"
+             $ref: "#/definitions/EnquiryResource"
          default:
            description: An error with a status code between 4XX and 5XX
            schema:
@@ -603,10 +468,10 @@ paths:
         in: body
         required: true
         schema:
-         $ref: "#/definitions/Correspondence"
+         $ref: "#/definitions/CorrespondenceResource"
      responses:
        200:
-         description: Successful operation
+         description: Ok, Enquiry updated
        default:
          description: An error with a status code between  4XX and 5XX
          schema:
@@ -618,10 +483,6 @@ paths:
       - Enquiry
       - Correspondence
      parameters:
-      - name: enquiryReferenceId
-        in: path
-        required: true
-        type: string
       - name: user-token
         in: header
         required: true
@@ -630,11 +491,15 @@ paths:
         in: header
         type: string
         required: true
+      - name: enquiryReferenceId
+        in: path
+        required: true
+        type: string
      responses:
        200:
          description: detailed Enquiry with it's responses
          schema:
-          $ref: "#/definitions/Enquiry"
+          $ref: "#/definitions/EnquiryResource"
        default:
          description: An error with a status code between  4XX and 5XX
          schema:
@@ -653,10 +518,10 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/UserRequest"
+          $ref: "#/definitions/UserResource"
      responses:
        201:
-        description: Ok, User resgistered, sent verification email
+        description: Ok, User registered, verification email sent
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -670,6 +535,10 @@ paths:
      summary: Updates an existing user
      description:  An endpoint for updating an existing Pango User
      parameters:
+       - name: user-token
+         in: header
+         required: true
+         type: string
        - name: userReferenceId
          in: path
          type: string
@@ -678,7 +547,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/UserRequest"
+          $ref: "#/definitions/UserResource"
      responses:
        200:
         description: Ok, User updated
@@ -686,31 +555,60 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /users/{userReferenceId}/profile:
+  /users/{userReferenceId}/changepassword:
     put:
      tags:
        - User
      consumes:
        - application/json
-     summary: Updates the profile of an existing user
-     description:  An endpoint for updating the profile of an existing Pango User
+     summary: Updates the password of an existing user
+     description:  An endpoint for updating the password of an existing Pango User
      parameters:
-       - name: userReferenceId
-         in: path
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
        - name: body
          in: body
          required: true
          schema:
-          $ref: "#/definitions/UserProfile"
+          $ref: "#/definitions/UserProfileResource"
      responses:
        200:
-        description: Ok, User updated
+        description: Ok, User password updated
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
+  /users/{userReferenceId}/changeprofilepic:
+    put:
+     tags:
+       - User
+     consumes:
+       - application/json
+     summary: Updates the profile picture of an existing user
+     description:  An endpoint for updating the profile picture of an existing Pango User
+     parameters:
+       - name: user-token
+         in: header
+         required: true
+         type: string
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
+       - name: body
+         in: body
+         required: true
+         schema:
+          $ref: "#/definitions/UserProfileResource"
+     responses:
+       200:
+        description: Ok, User profile picture updated
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -724,22 +622,22 @@ paths:
      summary: Creates a new preference for an existing Pango user
      description:  An endpoint for creating a new preference for an existing Pango user
      parameters:
-       - name: userReferenceId
-         in: path
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
        - name: body
          in: body
          required: true
          schema:
-          $ref: "#/definitions/UserPreferenceRequest"
+          $ref: "#/definitions/UserPreferenceResource"
      responses:
        201:
-         description: Ok, successfully created a new customer preference
+         description: Ok, successfully created a new user preference
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -752,21 +650,21 @@ paths:
      summary: gets all the preference for an existing Pango user
      description:  An endpoint for retrieving all the preferences for an existing Pango user
      parameters:
-       - name: userReferenceId
-         in: path
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
      responses:
        200:
          description: Ok, successfully retrieved all the preferences
          schema:
            type: array
            items:
-             $ref: "#/definitions/UserPreferenceResponse"       
+             $ref: "#/definitions/UserPreferenceResource"       
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -780,14 +678,14 @@ paths:
      summary: Updates an existing preference for an existing Pango user
      description:  An endpoint for updating an existing preference for an existing Pango user
      parameters:
-       - name: userReferenceId
-         in: path
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
+       - name: userReferenceId
+         in: path
+         type: string
+         required: true
        - name: preferenceId
          in: path
          required: true
@@ -796,7 +694,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/UserPreferenceRequest"
+          $ref: "#/definitions/UserPreferenceResource"
      responses:
        200:
          description: Ok, successfully updated the preference
@@ -812,16 +710,16 @@ paths:
       - application/json
      summary: Authenticate user by emailAddress and password
      description: |
-        An endpoint for authenticate a pango user with supplied emailAddress and password, an expiring access token is returned along side the firstname, lastname as well the userReferenceId
+        An endpoint for authenticate a pango user with supplied emailAddress and password, an expiring user token is returned along side the firstname, lastname as well the userReferenceId
      parameters:
       - name: body
         in: body
         required: true
         schema:
-         $ref: "#/definitions/Login"
+         $ref: "#/definitions/LoginResource"
      responses:
        200:
-        description: access-token , userReferenceId and username
+        description: user-token, userReferenceId, firstName and lastName
         schema:
          type: object
          properties:
@@ -834,13 +732,36 @@ paths:
           userReferenceId:
            type: string
            description: to be used in subsequent api calls
-          access-token:
+          user-token:
            type: string
            description: expiring encrypted access token, to be used in all API call for the loggged in user
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
+  /verify/confirmAccount:
+    get:
+      tags:
+       - User
+       - Registration
+      consumes:
+       - application/json
+      summary:
+        Verify the user
+      description:
+        An endpoint to verify the user's email address          
+      parameters:
+        - name: confirm-token
+          in: query
+          type: string
+          required: true
+      responses:
+        200:
+         description: Ok, user verified.
+        default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"          
   /rentals:
     get:
      tags:
@@ -849,19 +770,19 @@ paths:
       - application/json
      summary: Returns the rental history for the owner or the customer as specified in the query parameter
      description: |
-        An endpoint that returns the rental history of the owner or the customer as specified in the 'by' query parameter
+        An endpoint that returns the rental history of the owner or the customer as specified 'by' the propertyReferenceId
      parameters:
-       - name: userReferenceId
-         in: header
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
-       - name: by
-         in: query
+       - name: userReferenceId
+         in: header
+         type: string
          required: true
+       - name: propertyReferenceId
+         in: query
+         required: false
          type: string
      responses:
        200:
@@ -869,7 +790,41 @@ paths:
         schema:
          type: array
          items:
-          $ref : "#/definitions/UnitRentalHistory"
+          $ref : "#/definitions/UnitRentalHistoryResource"
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
+  /holdings:
+    get:
+     tags:
+      - Holdings
+     consumes:
+      - application/json
+     summary: Returns the holding history for the owner or the customer as specified in the query parameter
+     description: |
+        An endpoint that returns the holding history of the owner or the customer as specified  in the 'landlordIndicator' query parameter
+     parameters:
+       - name: user-token
+         in: header
+         required: true
+         type: string
+       - name: userReferenceId
+         in: header
+         type: string
+         required: true
+       - name: landlordIndicator
+         in: query
+         required: true
+         default: false
+         type: boolean
+     responses:
+       200:
+        description: List of property units holding history
+        schema:
+         type: array
+         items:
+          $ref : "#/definitions/UnitHoldingHistoryResource"
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -884,14 +839,14 @@ paths:
      description: |
         An endpoint that creates a new review for the given Pango rental by an owner or a customer as specified in the 'by' query parameter
      parameters:
-       - name: userReferenceId
-         in: header
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
+       - name: userReferenceId
+         in: header
+         type: string
+         required: true
        - name: by
          in: query
          required: true
@@ -904,7 +859,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/ReviewRequest"
+          $ref: "#/definitions/ReviewResource"
      responses:
        201:
         description: Ok, successfully created a new review
@@ -912,7 +867,7 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /reviews/by/{referenceId}:
+  /reviews/{referenceId}:
     get:
      tags:
       - Reviews
@@ -922,14 +877,14 @@ paths:
      description: |
         An endpoint that returns a list of reviews for a given property or for a customer as specified in the 'by' query parameter and the referenceId in the path parameter
      parameters:
-       - name: userReferenceId
-         in: header
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
+       - name: userReferenceId
+         in: header
+         type: string
+         required: true
        - name: by
          in: query
          required: true
@@ -944,7 +899,7 @@ paths:
         schema:
          type: array
          items:
-          $ref : "#/definitions/ReviewResponse"
+          $ref : "#/definitions/ReviewResource"
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -959,14 +914,14 @@ paths:
      description: |
         An endpoint that updates a specific review as specified in the path parameter
      parameters:
-       - name: userReferenceId
-         in: header
-         type: string
-         required: true
        - name: user-token
          in: header
          required: true
          type: string
+       - name: userReferenceId
+         in: header
+         type: string
+         required: true
        - name: reviewId
          in: path
          type: string
@@ -975,7 +930,7 @@ paths:
          in: body
          required: true
          schema:
-          $ref: "#/definitions/ReviewRequest"
+          $ref: "#/definitions/ReviewResource"
      responses:
        200:
         description: Ok, the review was updated successfully
@@ -984,14 +939,14 @@ paths:
          schema:
            $ref: "#/definitions/Error"
 definitions:
-  Property:
+  PropertyResource:
    type: object
    properties:
      propertyReferenceId:
       type: string
-     purpose:
+     propertyUnitId:
       type: string
-      description: Information indicating what this property is good for, For Example. Home or Business
+      description: Unit number of the property
      propertyDescription:
       type: string
       description: summary description of the property
@@ -999,41 +954,10 @@ definitions:
        type: string
        description: Information representing whether the property is for rent or sale
        default: FOR RENT
-     price:
-       type: number
-       format: double
-       description: Peice for renting or Buying this property
-     currency:
-       type: string
-     periodPrice:
-       type: string
-       description: Base period price. Ex-  per month(mo),  per year (yr)
-       default: mo
-     numberOfRooms:
-       type: integer
-       format: int32
-       description: Total number of rooms in this property unit
-     numberOfBedRooms:
-       type: integer
-       format: int32
-       description: Total number of bed rooms in this property unit
-     numberOfSelfContainedBedRooms:
-        type: integer
-        format: int32
-        description: Total number of bedrooms containing a bathroom in this property unit
-     numberOfBathRooms:
-        type: integer
-        format: int32
-     numberOfKitchens:
-       type: integer
-       format: int32
-     propertySize:
-      type: number
-      format: double
-      description:  Square unit area of the property
-     propertySizeUnit:
-      type : string
-      default: sqft
+     propertyRent:
+       $ref: "#/definitions/PropertyRent"
+     propertyFeature:
+       $ref: "#/definitions/PropertyFeature"
      availability:
       type: string
       description: Value represeanting whether the property is available now or soon
@@ -1045,26 +969,25 @@ definitions:
       type: integer
       format: int32
       description : Total number of tenant reviews on this property to date
-     propertyAmenities:
-      type: array
-      description: features to better describe this property. For Example  Air Conditioning, Ceiling Fans, Cable Ready, Washer/Dryer etc
-      items:
-       $ref: "#/definitions/Amenity"
-     photoUrl:
+     coverPhoto:
        $ref: "#/definitions/Attachment"
      distance:
       type: number
       format: double
       description: Total distnace in Kelometers from the location
      address:
+      $ref: "#/definitions/Address"
+     ownerReferenceId:
       type: string
-      description: Physical address of the property
-  PropertyDetail:
+      description: value representing the reference Id of the owner
+  PropertyDetailResource:
    type: object
    properties:
-     purpose:
+     propertyReferenceId:
       type: string
-      description: Information indicating what this property is good for, For Example. Home or Business
+     propertyUnitId:
+      type: string
+      description: Unit number of the property
      propertyDescription:
       type: string
       description: summary description of the property
@@ -1072,41 +995,10 @@ definitions:
        type: string
        description: Information representing whether the property is for rent or sale
        default: FOR RENT
-     price:
-       type: number
-       format: double
-       description: Price for renting or Buying this property
-     currency:
-       type: string
-     periodPrice:
-       type: string
-       description: Base period price. Ex-  per month(mo),  per year (yr)
-       default: mo
-     numberOfRooms:
-       type: integer
-       format: int32
-       description: Total number of rooms in this property unit
-     numberOfBedRooms:
-       type: integer
-       format: int32
-       description: Total number of bed rooms in this property unit
-     numberOfSelfContainedBedRooms:
-        type: integer
-        format: int32
-        description: Total number of bedrooms containing a bathroom in this property unit
-     numberOfBathRooms:
-        type: integer
-        format: int32
-     numberOfKitchens:
-       type: integer
-       format: int32
-     propertySize:
-      type: number
-      format: double
-      description:  Square unit area of the property
-     propertySizeUnit:
-      type : string
-      default: sqft
+     propertyRent:
+       $ref: "#/definitions/PropertyRent"
+     propertyFeature:
+       $ref: "#/definitions/PropertyFeature"
      availability:
       type: string
       description: Value represeanting whether the property is available now or soon
@@ -1114,14 +1006,9 @@ definitions:
       type: string
       format: YYYY-MM-DD
       description: Available on (future date) or available since (past date)
-     rentalPeriod:
-      type: string
-      description: Lease Length. For Example 12 Month Lease
-     propertyAmenities:
-      type: array
-      description: features to better describe this property. For Example  Air Conditioning, Ceiling Fans, Cable Ready, Washer/Dryer etc
-      items:
-       $ref: "#/definitions/Amenity"
+     autoListInd:
+      type: boolean
+      description: Indicates whether the property should be auto-listed once the current rental expires
      rating:
       type: integer
       format: int32
@@ -1130,14 +1017,13 @@ definitions:
       type: integer
       format: int32
       description : Total number of tenant reviews on this property to date
-     photoUrls:
+     coverPhoto:
+      $ref: "#/definitions/Attachment"
+     photoUrl:
       type: array
       items:
         $ref: "#/definitions/Attachment"
       description: Images encoded in base64 representing the property
-     address:
-      type: string
-      description: Physical address of the
      location:
       type: array
       description: Longitide[0] and Latitude[1] location components of this property. For Example [-73.93383000695911, 40.81949109558767] implying a property is located at -73.93414657 longitude and 40.82302903 latitude.
@@ -1145,10 +1031,19 @@ definitions:
         type: number
         format: double
         description: location component
+     address:
+      type: string
+      description: Physical address of the
+     ownerReferenceId:
+      type: string
+      description: value representing the reference Id of the owner
      terms:
       type: string
       description: Terms,  conditions and any restrictions information
-  Enquiry:
+     active:
+      type: boolean
+      description: Indicates whether the property is active or not
+  EnquiryResource:
    type: object
    properties:
     enquiryReferenceId:
@@ -1167,7 +1062,14 @@ definitions:
      format: "YYYY-MM-ddThh:mm:ssTZD"
      description: The Enquiry date and time of the enquiry
     enquiredBy:
-     $ref: "#/definitions/UserResponse"
+     type: string
+     description: referenceId of the user who made the enquiry
+    enquiredType:
+     type: string
+     description: Type of the enquiry - INTERESTED, REQUEST_INFO, SITE_VISIT, TAKEN or BOOK_PROPERTY
+    propertyReferenceId:
+     type: string
+     description: referenceId of the property against which the enquiry is made
     correspondenceCount:
      type: integer
      format: int32
@@ -1176,218 +1078,124 @@ definitions:
       type: array
       description: An array of correspondence, applicable to only to the get operation.
       items:
-       $ref: "#/definitions/Correspondence"
-  PropertyEnquiry:
-   type: object
-   properties:
-     enquires:
-       description: An array of enquiries to this property
-       type: array
-       items:
-        $ref:  "#/definitions/Enquiry"
-     propertyReferenceId:
-       type: string
-     purpose:
-       type: string
-       description: Information representing whether the property is for rent or sale
-       default: FOR RENT
-     price:
-       type: number
-       format: double
-       description: Price for renting or Buying this property
-     currency:
-       type: string
-     periodPrice:
-       type: string
-       description: Base period price. Ex-  per month(mo),  per year (yr)
-       default: mo
-     numberOfRooms:
-       type: integer
-       format: int32
-       description: Total number of rooms in this property unit
-     numberOfBedRooms:
-       type: integer
-       format: int32
-       description: Total number of bed rooms in this property unit
-     numberOfSelfContainedBedRooms:
-        type: integer
-        format: int32
-        description: Total number of bedrooms containing a bathroom in this property unit
-     numberOfBathRooms:
-        type: integer
-        format: int32
-     numberOfKitchens:
-       type: integer
-       format: int32
-     propertySize:
-      type: number
-      format: double
-      description:  Square unit area of the property
-     propertySizeUnit:
-      type : string
-      default: sqft
-     availability:
-      type: string
-      description: Value represeanting whether the property is available now or soon
-  Correspondence:
+       $ref: "#/definitions/CorrespondenceResource"
+  CorrespondenceResource:
    type: object
    properties:
     message:
      type: string
-    correspondenceType:
-     type: string
-     description: general category about this response. For Example . SITE_VISIT, TAKEN, REQUEST_INFO etc.
-    respondedOn:
+    attachment:
+      $ref: "#/definitions/Attachment"
+    correspondenceDate:
      type: string
      format: "YYYY-MM-DDThh:mm:ssTZD"
      description: The response date and time of the enquiry
-    attachments:
-     type: array
-     description: an array of attchment contents requested by either parties up to 3 attachments
-     items:
-      $ref: "#/definitions/Attachment"
+    correspondenceType:
+     type: string
+     description: general category about this response. For Example . SITE_VISIT, TAKEN, REQUEST_INFO etc.
+    owner:
+     type: boolean
+     description: indicator to identify an owner
   Attachment:
    type: object
    properties:
-    content:
+    fileType:
      type: string
-     description: base64 encoded attachment content. for Pictures etc
-    extension:
-     type: string
-     description: File Mimetype. For Example png, jpeg, pdf
-    size:
+    fileName:
+     type: string     
+    fileSize:
      type: number
      format: double
      description: orginal content size in bytes
+    contentBase64:
+     type: string
+     description: base64 encoded attachment content. for Pictures etc
+    fileDescription:
+     type: string
+     description: A brief description of the image - user enters the description while uploading the pic
+    profilePicture:
+     type: boolean
+     description: indicates whether the attachment is a profile pic or a cover photo
   Error:
    type: object
    properties:
-     code:
+     title:
+       type: string
+     status:
        type: integer
        format: int32
-     message:
+     detail:
        type: string
-     fields:
+     timeStamp:
+      type: number
+     developerMessage:
       type: string
-  UserResponse:
-   type: object
-   properties:
-    userReferenceId:
-      type: string
-    firstName:
-     type: string
-    lastName:
-     type: string
-    phoneNumber:
-     type: string
-    altnatePhoneNumber:
-     type: string
-    emailAddress:
-     type: string
-    alternateEmailAddress:
-     type: string
-    address:
-     $ref: "#/definitions/Address"
-    profile:
-     $ref: "#/definitions/UserProfile"
-  UserRequest:
-   type: object
-   properties:
-    firstName:
-     type: string
-    lastName:
-     type: string
-    phoneNumber:
-     type: string
-    alternatePhoneNumber:
-     type: string
-    emailAddress:
-     type: string
-    alternateEmailAddress:
-     type: string
-    password:
-     type: string
-    profilePicture:
-     type: string
-    address:
-     $ref: "#/definitions/Address"
-  UserRentRequest:
-   type: object
-   properties:
-    firstName:
-     type: string
-    lastName:
-     type: string
-    phoneNumber:
-     type: string
-    emailAddress:
-     type: string
-    address:
-     $ref: "#/definitions/Address"
-  UserProfile:
-   type: object
-   properties:
-    emailAddress:
-     type: string
-    password:
-     type: string
-    profilePicture:
-     $ref: "#/definitions/Attachment"
-    searchHistory:
+     errors:
       type: array
       items:
-       $ref: "#/definitions/SearchCriteria"
-  UserPreferenceRequest:
+        $ref: "#/definitions/PangoValidationError"
+  UserResource:
    type: object
    properties:
+    firstName:
+     type: string
+    lastName:
+     type: string
+    phoneNumber:
+     type: string
+    password:
+     type: string
+    emailAddress:
+     type: string
+    address:
+     $ref: "#/definitions/Address"
+  UserRentResource:
+   type: object
+   properties:
+    startDate:
+     type: string
+    endDate:
+     type: string
+    phoneNumber:
+     type: string
+    emailAddress:
+     type: string
+    address:
+     $ref: "#/definitions/Address"
+  UserProfileResource:
+   type: object
+   properties:
+    password:
+     type: string
+    newPassword:
+     type: string
+    confirmPassword:
+     type: string
+    profilePic:
+     type: string
+  UserPreferenceResource:
+   type: object
+   properties:
+    preferenceId:
+     type: string
     preferenceType:
      type: string
      description: reason for this preference. For Example. Notification
-    startDate:
+    fromDate:
      type: string
      format: YYYY-MM-dd
     toDate:
      type: string
      format: YYYY-MM-dd
-    forDays:
-     type: integer
-     format: int32
     active:
      type: boolean
      description: status display or if set to false will diactivate preference
-    notify:
+    sendNotification:
      type: boolean
-    notifyOnCriteria:
-     $ref: "#/definitions/SearchCriteria"
-  UserPreferenceResponse:
-   type: object
-   properties:
-    userPreferenceId:
+    category:
      type: string
-    preferenceType:
-     type: string
-     description: reason for this preference. For Example. Notification
-    startDate:
-     type: string
-     format: YYYY-MM-dd
-    toDate:
-     type: string
-     format: YYYY-MM-dd
-    forDays:
-     type: integer
-     format: int32
-    active:
-     type: boolean
-     description: status display or if set to false will deactivate preference
-    paid:
-     type: boolean
-    paidOn:
-     type: string
-     format: YYYY-MM-dd
-    notify:
-     type: boolean
-    notifyOnCriteria:
-     $ref: "#/definitions/SearchCriteria"
+    userSearchHistory:
+     $ref: "#/definitions/UserSearchHistory"
   SearchCriteria:
    type: object
    properties:
@@ -1440,62 +1248,49 @@ definitions:
      description: NA for E. Africa region
     country:
      type: string
-  Login:
+  LoginResource:
    type: object
    properties:
     emailAddress:
      type: string
     password:
      type: string
-  UnitRentalHistory:
+  UnitRentalHistoryResource:
    type: object
    properties:
     rentalReferenceId:
       type: string
-    propertyUnit:
-      $ref: "#/definitions/PropertyDetail"
-    user:
-      $ref: "#/definitions/UserResponse"
     startDate:
       type: string
       format: YYYY-MM-DD
     endDate:
       type: string
       format: YYYY-MM-DD
-  UnitHoldingHistory:
+    active:
+      type: boolean
+    propertyReferenceId:
+      type: string
+    user:
+      type: string
+  UnitHoldingHistoryResource:
    type: object
    properties:
     holdingReferenceId:
       type: string
-    propertyUnit:
-      $ref: "#/definitions/PropertyDetail"
-    user:
-      $ref: "#/definitions/UserResponse"
     startDate:
       type: string
-      format: YYYY-MM-DD
+      format: YYYY-MM-ddThh:mm:ssTZD
     endDate:
       type: string
-      format: YYYY-MM-DD
-  ReviewRequest:
-    type: object
-    properties:
-      reviewText:
-        type: string
-      reviewedBy:
-        type: string
-      reviewedDate:
-        type: string
-        format: YYYY-MM-DD
-      recommend:
-        type: string
-      rating:
-        type: string
-      userReferenceId:
-        type: string
-      propertyReferenceId:
-        type: string
-  ReviewResponse:
+      format: YYYY-MM-ddThh:mm:ssTZD
+    timeRemaining:
+      type: string
+      format: hh:mm:ss
+    propertyReferenceId:
+      type: string
+    user:
+      type: string      
+  ReviewResource:
     type: object
     properties:
       reviewId:
@@ -1508,13 +1303,57 @@ definitions:
         type: string
         format: YYYY-MM-DD
       recommend:
-        type: string
+        type: boolean
       rating:
         type: string
-      user:
-        $ref: "#/definitions/UserResponse"
-      propertyUnit:
-        $ref: "#/definitions/PropertyDetail"
+      userReferenceId:
+        type: string
+      propertyReferenceId:
+        type: string
+  PropertyFeature:
+    type: object
+    properties:
+      studio:
+        type: boolean
+        default: false
+      nbrOfRooms:
+        type: integer
+      nbrOfBedRooms:
+        type: integer
+      nbrOfSelfContainedBedRooms:
+        type: integer
+      nbrOfBaths:
+        type: integer
+      nbrOfKitchens:
+        type: integer
+      propertySize:
+        type: number
+        format: double
+      sizeUnit:
+        type: string
+        default: "sqft"
+      additionalFeatures:
+        type: array
+        items:
+          $ref: "#/definitions/Amenity"
+  PropertyRent:
+    type: object
+    properties:
+      amount:
+        type: number
+        format: double
+      currency:
+        type: string
+      periodforAmount:
+        $ref: "#/definitions/PerPeriod"  
+      rentalPeriod:
+        type: string      
+  PerPeriod:
+    type: object
+    properties:
+      value:
+        type: string
+        enum: ["MONTHLY", "YEARLY"]
   Amenity:
      type: object
      properties:
