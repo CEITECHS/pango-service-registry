@@ -3,7 +3,7 @@ swagger: '2.0'
 
 # This is your document metadata
 info:
-  version: "0.0.8"
+  version: "0.0.10"
   title: Pango API
   description: Move you App forwad with Pango API
   # The Domain of Service
@@ -867,7 +867,7 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /reviews/{referenceId}:
+  /reviews/by/{referenceId}:
     get:
      tags:
       - Reviews
@@ -1196,41 +1196,6 @@ definitions:
      type: string
     userSearchHistory:
      $ref: "#/definitions/UserSearchHistory"
-  SearchCriteria:
-   type: object
-   properties:
-    searchDate:
-     type: string
-     format: "YYYY-MM-ddThh:mm:ssTZD"
-    longitude:
-     type: number
-     format: double
-    latitude:
-     type: number
-     format: double
-    radius:
-     type: integer
-     format: int32
-    propertyPurpose:
-     type: string
-    moveInDate:
-     type: string
-    roomsCount:
-     type: integer
-     format: int32
-    bedRoomsCount:
-     type: integer
-     format: int32
-    selfContainedRoom:
-     type: boolean
-    minPrice:
-     type: number
-     format: double
-    maxPrice:
-     type: number
-     format: double
-    features:
-     type: string
   Address:
    type: object
    properties:
@@ -1360,4 +1325,58 @@ definitions:
        amenityName:
          type: string
        amenityAvailable:
-         type: boolean
+         type: boolean  
+  PangoValidationError:
+    type: object
+    properties:
+      errorCode:
+        type: string
+      errorMessage:
+        type: string
+  UserSearchHistory:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date-time
+      query:
+          $ref: "#/definitions/PropertySearchCriteria"
+      resultCount:
+        type: integer
+        format: int32
+  PropertySearchCriteria:
+    type: object
+    properties:
+      searchDate:
+        type: string
+        format: date-time        
+      longitude:
+        type: number
+        format: double
+      latitude:
+        type: number
+        format: double
+      radius:
+        type: integer
+        format: int32
+      propertyPupose:
+        type: string
+      moveInDateAsString:
+        type: string
+      roomsCount:
+        type: integer
+        format: int32
+      bedRoomsCount:
+        type: number
+        format: double
+      bathCount:
+        type: integer
+        format: int32
+      minPrice:
+        type: integer
+        format: int32
+      maxPrice:
+        type: integer
+        format: int32
+      amenities:
+        type: string
