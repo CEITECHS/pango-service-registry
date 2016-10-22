@@ -790,7 +790,7 @@ paths:
         schema:
          type: array
          items:
-          $ref : "#/definitions/UnitRentalHistoryResource"
+          $ref : "#/definitions/PropertyRentalHistoryResource"
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -824,7 +824,7 @@ paths:
         schema:
          type: array
          items:
-          $ref : "#/definitions/UnitHoldingHistoryResource"
+          $ref : "#/definitions/PropertyHoldingHistoryResource"
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -873,7 +873,7 @@ paths:
       - Reviews
      consumes:
       - application/json
-     summary: Returns the list of reviews 
+     summary: Returns the list of reviews
      description: |
         An endpoint that returns a list of reviews for a given property or for a customer as specified in the 'by' query parameter and the referenceId in the path parameter
      parameters:
@@ -1102,7 +1102,7 @@ definitions:
     fileType:
      type: string
     fileName:
-     type: string     
+     type: string
     fileSize:
      type: number
      format: double
@@ -1132,8 +1132,11 @@ definitions:
       type: string
      errors:
       type: array
+      description: an Array of errors messages occured
       items:
-        $ref: "#/definitions/PangoValidationError"
+          type: string
+          description: a specific error message
+
   UserResource:
    type: object
    properties:
@@ -1220,7 +1223,7 @@ definitions:
      type: string
     password:
      type: string
-  UnitRentalHistoryResource:
+  PropertyRentalHistoryResource:
    type: object
    properties:
     rentalReferenceId:
@@ -1237,7 +1240,7 @@ definitions:
       type: string
     user:
       type: string
-  UnitHoldingHistoryResource:
+  PropertyHoldingHistoryResource:
    type: object
    properties:
     holdingReferenceId:
@@ -1254,7 +1257,7 @@ definitions:
     propertyReferenceId:
       type: string
     user:
-      type: string      
+      type: string
   ReviewResource:
     type: object
     properties:
@@ -1310,9 +1313,9 @@ definitions:
       currency:
         type: string
       periodforAmount:
-        $ref: "#/definitions/PerPeriod"  
+        $ref: "#/definitions/PerPeriod"
       rentalPeriod:
-        type: string      
+        type: string
   PerPeriod:
     type: object
     properties:
@@ -1325,14 +1328,7 @@ definitions:
        amenityName:
          type: string
        amenityAvailable:
-         type: boolean  
-  PangoValidationError:
-    type: object
-    properties:
-      errorCode:
-        type: string
-      errorMessage:
-        type: string
+         type: boolean
   UserSearchHistory:
     type: object
     properties:
