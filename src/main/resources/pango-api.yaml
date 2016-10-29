@@ -12,7 +12,7 @@ host: api.chaguapango.com
 schemes:
    - https
 # Will be prefixed to all paths   
-basePath: /v1
+basePath: /apis/v1
 produces: 
  - application/json
 paths:
