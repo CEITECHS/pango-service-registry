@@ -945,6 +945,8 @@ paths:
      - Attachments
     consumes:
      - application/x-www-form-urlencoded
+    produces:
+     - application/json
     summary: An end-point to handle any Pango relates uploads Ex. property-photos, profile-picture etc.
     description: |
       This end-point upload an attachment to the specified upload-category , attachment size should not exceed 1MB, supported types are [png,jpeg,jpg,pdf]. This API returns the attahment location
@@ -958,15 +960,29 @@ paths:
        type: string
        required: true
      - name: attachmentReferenceId
-       description: Pango referenceId [property, user, corespondence] to assocsite this attachment with
+       description: Pango referenceId for one of `[Property, User, Inquiry]` to assocsite this attachment to
        in: path
        type: string
        required: true
      - name: attachment
-       description: The actual file to upload
+       description: The actual file to upload, size should not exceed `1MB`
        in: formData
        type: file
        required: true
+     - name: attachmentCategory
+       in: formData
+       type: string
+       description: Accepted value is one of  `[PROPERTY, PROFILE_PICTURE, CORRESPONDENCE]`
+       required: true
+     - name: description
+       in: formData
+       type: string
+       required: true
+       description: this denotes attachment description, like caption etc
+     - name: thumbnail
+       in: formData
+       type: boolean
+       description: indicates wheather the image should be used as a thumbnail, default is `false`
     responses:
       200:
         description: Ok, Attachment uploaded successfuly
@@ -976,7 +992,7 @@ paths:
            attachmnetUrl:
             type: string
       default:
-        description: An error with a status code between 4XX and 5XX
+        description: An error with a status code between `4XX` and `5XX`
         schema:
           $ref: "#/definitions/Error"
 definitions:
@@ -1005,7 +1021,7 @@ definitions:
      rating:
       type: integer
       format: int32
-      description: Number representing everage stars rating out of 5 for this property
+      description: Number representing everage stars rating out of `5` for this property
      reviewCount:
       type: integer
       format: int32
