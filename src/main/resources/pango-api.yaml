@@ -7,13 +7,13 @@ info:
   title: Pango API
   description: Move you App forwad with Pango API
   # The Domain of Service
-host: api.chaguapango.com 
+host: dev.pango-apis.com
 #Array of sll schemes Pango API supports
 schemes:
    - https
-# Will be prefixed to all paths   
+# Will be prefixed to all paths
 basePath: /apis/v1
-produces: 
+produces:
  - application/json
 paths:
   /properties:
@@ -105,7 +105,7 @@ paths:
             $ref: "#/definitions/Error"
     post:
       summary: Create a new property
-      description: This endpoint will create a new property. This property will be in an unverified status till the coordinator verifies it.  
+      description: This endpoint will create a new property. This property will be in an unverified status till the coordinator verifies it.
       tags:
       - Properties
       consumes:
@@ -122,7 +122,7 @@ paths:
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
-           $ref: "#/definitions/Error"  
+           $ref: "#/definitions/Error"
   /properties/list:
     get:
        summary: Get a list of active rental property unit rented or held by a Pango customer
@@ -150,23 +150,23 @@ paths:
          in: query
          required: true
          type: boolean
-         description: Landlord indicator 
+         description: Landlord indicator
        responses:
          200:
            description: List of Pango rental units assigned to the customer filtered as per the status
            schema:
             type: array
             items:
-              $ref: "#/definitions/PropertyResource" 
+              $ref: "#/definitions/PropertyResource"
          default:
            description: An error with a status code between  4XX and 5XX
            schema:
-            $ref: "#/definitions/Error"           
+            $ref: "#/definitions/Error"
   /properties/pending/list:
     get:
       summary: Rental Properties
       description: |
-        The Properties endpoint returns information about *Pango* rental properties that have not been verified. The properties can be grouped by a coordinator or by the owner. 
+        The Properties endpoint returns information about *Pango* rental properties that have not been verified. The properties can be grouped by a coordinator or by the owner.
       tags:
       - Properties
       parameters:
@@ -255,9 +255,9 @@ paths:
          description: Unique identifier representing a specific Pango rental property
        - name: body
          in: body
-         description: Updated property 
+         description: Updated property
          required: true
-         schema: 
+         schema:
           $ref: "#/definitions/PropertyDetailResource"
        tags:
        - Property
@@ -270,7 +270,7 @@ paths:
            $ref: "#/definitions/Error"
   /properties/{propertyReferenceId}/rent:
     put:
-       summary: Updates a specific rental property unit with the rental details 
+       summary: Updates a specific rental property unit with the rental details
        description: |
          The Property endpoint updates a specific Pango rental property unit with the rental details
        tags:
@@ -307,12 +307,12 @@ paths:
             $ref: "#/definitions/Error"
   /properties/{propertyReferenceId}/hold:
     put:
-       summary: Updates a specific rental property unit with the holding details 
+       summary: Updates a specific rental property unit with the holding details
        description: |
          The Property endpoint updates a specific Pango rental property unit with the holding details. As part of this API the following orchestration will take place
          1. Calling the tegopesa payment APIs for making a holding payment
          2. Creating a transaction in customer transaction history and
-         3. Creating a record in unit holding history 
+         3. Creating a record in unit holding history
        tags:
        - PropertyUnit
        - Holding PropertyUnit
@@ -664,11 +664,11 @@ paths:
          schema:
            type: array
            items:
-             $ref: "#/definitions/UserPreferenceResource"       
+             $ref: "#/definitions/UserPreferenceResource"
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
-           $ref: "#/definitions/Error"           
+           $ref: "#/definitions/Error"
   /users/{userReferenceId}/preferences/{preferenceId}:
     put:
      tags:
@@ -749,7 +749,7 @@ paths:
       summary:
         Verify the user
       description:
-        An endpoint to verify the user's email address          
+        An endpoint to verify the user's email address
       parameters:
         - name: confirm-token
           in: query
@@ -761,7 +761,7 @@ paths:
         default:
          description: An error with a status code between 4XX and 5XX
          schema:
-           $ref: "#/definitions/Error"          
+           $ref: "#/definitions/Error"
   /rentals:
     get:
      tags:
@@ -938,6 +938,47 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
+  /attachments/{attachmentReferenceId}:
+   post:
+    tags:
+     - Uploads
+     - Attachments
+    consumes:
+     - application/x-www-form-urlencoded
+    summary: An end-point to handle any Pango relates uploads Ex. property-photos, profile-picture etc.
+    description: |
+      This end-point upload an attachment to the specified upload-category , attachment size should not exceed 1MB, supported types are [png,jpeg,jpg,pdf]. This API returns the attahment location
+    parameters:
+     - name: user-token
+       in: header
+       required: true
+       type: string
+     - name:  userReferenceId
+       in: header
+       type: string
+       required: true
+     - name: attachmentReferenceId
+       description: Pango referenceId [property, user, corespondence] to assocsite this attachment with
+       in: path
+       type: string
+       required: true
+     - name: attachment
+       description: The actual file to upload
+       in: formData
+       type: file
+       required: true
+    responses:
+      200:
+        description: Ok, Attachment uploaded successfuly
+        schema:
+         type: object
+         properties:
+           attachmnetUrl:
+            type: string
+      default:
+        description: An error with a status code between 4XX and 5XX
+        schema:
+          $ref: "#/definitions/Error"
 definitions:
   PropertyResource:
    type: object
