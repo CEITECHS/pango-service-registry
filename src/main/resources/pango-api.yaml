@@ -7,10 +7,11 @@ info:
   title: Pango API
   description: Move you App forwad with Pango API
   # The Domain of Service
-host: dev.pango-apis.com
+host: dev.pango-apis.com #localhost:8090
 #Array of sll schemes Pango API supports
 schemes:
    - https
+   - http
 # Will be prefixed to all paths
 basePath: /apis/v1
 produces:
@@ -944,7 +945,7 @@ paths:
      - Uploads
      - Attachments
     consumes:
-     - application/x-www-form-urlencoded
+     - multipart/form-data
     produces:
      - application/json
     summary: An end-point to handle any Pango relates uploads Ex. property-photos, profile-picture etc.
@@ -964,25 +965,25 @@ paths:
        in: path
        type: string
        required: true
+     - name: attachmentCategory
+       in: query
+       type: string
+       description: Accepted value is one of  `[PROPERTY, PROFILE_PICTURE, CORRESPONDENCE]`
+       required: true
+     - name: attachmentDescription
+       in: query
+       type: string
+       required: true
+       description: this denotes attachment description, like caption etc
+     - name: isThumbnail
+       in: query
+       type: boolean
+       description: indicates wheather the image should be used as a thumbnail, default is `false`
      - name: attachment
        description: The actual file to upload, size should not exceed `1MB`
        in: formData
        type: file
        required: true
-     - name: attachmentCategory
-       in: formData
-       type: string
-       description: Accepted value is one of  `[PROPERTY, PROFILE_PICTURE, CORRESPONDENCE]`
-       required: true
-     - name: description
-       in: formData
-       type: string
-       required: true
-       description: this denotes attachment description, like caption etc
-     - name: thumbnail
-       in: formData
-       type: boolean
-       description: indicates wheather the image should be used as a thumbnail, default is `false`
     responses:
       200:
         description: Ok, Attachment uploaded successfuly
