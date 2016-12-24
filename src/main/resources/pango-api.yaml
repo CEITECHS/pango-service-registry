@@ -740,6 +740,43 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
+  /authenticate/refresh:
+    get:
+     tags:
+      - Login
+      - Refresh Token
+     consumes:
+      - application/json
+     summary: Refresh Authenticated user-token
+     description: |
+        An endpoint for refreshing  authenticated a pango user token before expiring , with supplied old user-token and , an a new expiring user token is returned along side the firstname, lastname as well the userReferenceId
+     parameters:
+      - name: user-token
+        in: header
+        type: string
+        required: true
+     responses:
+       200:
+        description: user-token, userReferenceId, firstName and lastName
+        schema:
+         type: object
+         properties:
+          firstName:
+           type: string
+           description: logged in user's first name
+          lastName:
+           type: string
+           description: logged in user's last name
+          userReferenceId:
+           type: string
+           description: to be used in subsequent api calls
+          user-token:
+           type: string
+           description: expiring encrypted access token, to be used in all API call for the loggged in user
+       default:
+         description: An error with a status code between 4XX and 5XX
+         schema:
+           $ref: "#/definitions/Error"
   /verify/confirmAccount:
     get:
       tags:
