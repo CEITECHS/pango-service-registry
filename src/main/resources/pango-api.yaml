@@ -993,10 +993,6 @@ paths:
        in: header
        required: true
        type: string
-     - name:  userReferenceId
-       in: header
-       type: string
-       required: true
      - name: attachmentReferenceId
        description: Pango referenceId for one of `[Property, User, Inquiry]` to assocsite this attachment to
        in: path
