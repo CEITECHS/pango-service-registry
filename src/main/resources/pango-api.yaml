@@ -106,7 +106,7 @@ paths:
             $ref: "#/definitions/Error"
     post:
       summary: Create a new property
-      description: This endpoint will create a new property. This property will be in an unverified status till the coordinator verifies it.
+      description: This endpoint will create a new property. This property will be in an unverified status till the coordinator verifies it. For  Upload,Update or Delete of attachments see `/attachments`
       tags:
       - Properties
       consumes:
@@ -446,7 +446,7 @@ paths:
              $ref: "#/definitions/Error"
   /properties/enquiries/{enquiryReferenceId}:
     put:
-     summary: Updates an existing Enquiry  with correspondence from either the potential tenant or the landlord
+     summary: Updates an existing Enquiry  with correspondence from either the potential tenant or the landlord. For  Upload,Update or Delete of attachments see `/attachments`
      tags:
       - Enquiry
       - Correspondence
@@ -513,7 +513,7 @@ paths:
      consumes:
        - application/json
      summary: Creates a new Pango user.
-     description:  An endpoint for creating a new Pango user, an email with verification link will be sent to the registered email address
+     description:  An endpoint for creating a new Pango user, an email with verification link will be sent to the registered email address. For  Upload,Update or Delete of attachments like profile picture see `/attachments`
      parameters:
        - name: body
          in: body
@@ -581,35 +581,6 @@ paths:
      responses:
        200:
         description: Ok, User password updated
-       default:
-         description: An error with a status code between 4XX and 5XX
-         schema:
-           $ref: "#/definitions/Error"
-  /users/{userReferenceId}/changeprofilepic:
-    put:
-     tags:
-       - User
-     consumes:
-       - application/json
-     summary: Updates the profile picture of an existing user
-     description:  An endpoint for updating the profile picture of an existing Pango User
-     parameters:
-       - name: user-token
-         in: header
-         required: true
-         type: string
-       - name: userReferenceId
-         in: path
-         type: string
-         required: true
-       - name: body
-         in: body
-         required: true
-         schema:
-          $ref: "#/definitions/UserProfileResource"
-     responses:
-       200:
-        description: Ok, User profile picture updated
        default:
          description: An error with a status code between 4XX and 5XX
          schema:
@@ -976,7 +947,7 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /attachments/{attachmentReferenceId}:
+  /attachments/{attachmentParentReferenceId}:
    post:
     tags:
      - Uploads
@@ -993,7 +964,7 @@ paths:
        in: header
        required: true
        type: string
-     - name: attachmentReferenceId
+     - name: attachmentParentReferenceId
        description: Pango referenceId for one of `[Property, User, Inquiry]` to assocsite this attachment to
        in: path
        type: string
@@ -1021,14 +992,93 @@ paths:
       200:
         description: Ok, Attachment uploaded successfuly
         schema:
-         type: object
-         properties:
-           attachmnetUrl:
-            type: string
+         $ref: "#/definitions/Attachment"
       default:
         description: An error with a status code between `4XX` and `5XX`
         schema:
           $ref: "#/definitions/Error"
+   put:
+    tags:
+     - Uploads
+     - Attachments
+    consumes:
+     - multipart/form-data
+    produces:
+     - application/json
+    summary: An end-point to handle any Pango relates attachments replacement/updates Ex. property-photos, profile-picture etc.
+    description: |
+      This end-point replace an attachment of the  specified id and upload-category , attachment size should not exceed 1MB, supported types are [png,jpeg,jpg,pdf]. This API returns the attahment location
+    parameters:
+     - name: user-token
+       in: header
+       required: true
+       type: string
+     - name: attachmentParentReferenceId
+       description: Attachment referenceId, not the parent-id as used in the post method
+       in: path
+       type: string
+       required: true
+     - name: attachmentCategory
+       in: query
+       type: string
+       description: Accepted value is one of  `[PROPERTY, PROFILE_PICTURE, CORRESPONDENCE]`
+       required: true
+     - name: attachmentDescription
+       in: query
+       type: string
+       required: true
+       description: this denotes attachment description, like caption etc
+     - name: isThumbnail
+       in: query
+       type: boolean
+       description: indicates wheather the image should be used as a thumbnail, default is `false`
+     - name: attachment
+       description: The actual file to upload, size should not exceed `1MB`
+       in: formData
+       type: file
+       required: true
+    responses:
+      200:
+        description: Ok, Attachment uploaded successfuly
+        schema:
+         $ref: "#/definitions/Attachment"
+      default:
+        description: An error with a status code between `4XX` and `5XX`
+        schema:
+          $ref: "#/definitions/Error"
+   delete:
+    tags:
+     - Uploads
+     - Attachments
+    produces:
+     - application/json
+    summary: An end-point to handle any Pango relates attachments replacement/updates Ex. property-photos, profile-picture etc.
+    description: |
+      This end-point replace an attachment of the  specified id and upload-category , attachment size should not exceed 1MB, supported types are [png,jpeg,jpg,pdf]. This API returns the attahment location
+    parameters:
+     - name: user-token
+       in: header
+       required: true
+       type: string
+     - name: attachmentParentReferenceId
+       description: Attachment referenceId, not the parent-id as used in the post method
+       in: path
+       type: string
+       required: true
+     - name: attachmentCategory
+       in: query
+       type: string
+       description: Accepted value is one of  `[PROPERTY, PROFILE_PICTURE, CORRESPONDENCE]`
+    responses:
+      200:
+        description: Ok, Attachment deleted successfuly
+        schema:
+         $ref: "#/definitions/Attachment"
+      default:
+        description: An error with a status code between `4XX` and `5XX`
+        schema:
+          $ref: "#/definitions/Error"
+
 definitions:
   PropertyResource:
    type: object
@@ -1110,7 +1160,7 @@ definitions:
       description : Total number of tenant reviews on this property to date
      coverPhoto:
       $ref: "#/definitions/Attachment"
-     photoUrl:
+     photos:
       type: array
       items:
         $ref: "#/definitions/Attachment"
@@ -1167,16 +1217,19 @@ definitions:
      description: Total messages count exchanged between the two parties to this Enquiry
     correspondence:
       type: array
-      description: An array of correspondence, applicable to only to the get operation.
+      description: An array of correspondence, applicable to only the get operation.
       items:
        $ref: "#/definitions/CorrespondenceResource"
+    attachments:
+      type: array
+      description: An array of attachments, ordered by most recent first
+      items:
+       $ref: "#/definitions/Attachment"
   CorrespondenceResource:
    type: object
    properties:
     message:
      type: string
-    attachment:
-      $ref: "#/definitions/Attachment"
     correspondenceDate:
      type: string
      format: "YYYY-MM-DDThh:mm:ssTZD"
@@ -1190,23 +1243,22 @@ definitions:
   Attachment:
    type: object
    properties:
-    fileType:
+    referenceId:
      type: string
-    fileName:
+    parentReferenceId:
      type: string
-    fileSize:
-     type: number
-     format: double
-     description: orginal content size in bytes
-    contentBase64:
+    category:
      type: string
-     description: base64 encoded attachment content. for Pictures etc
-    fileDescription:
+     description: attachment category Ex. [PROPERTY, PROFILE_PICTURE, CORRESPONDENCE]
+    description:
      type: string
-     description: A brief description of the image - user enters the description while uploading the pic
-    profilePicture:
+     description: tells more about what this attachment is about
+    thumbnail:
      type: boolean
-     description: indicates whether the attachment is a profile pic or a cover photo
+     description: Indicates whether this attachment can be used as a thumbnail.
+    url:
+     type: string
+     description: attachment location url
   Error:
    type: object
    properties:
@@ -1436,7 +1488,7 @@ definitions:
     properties:
       searchDate:
         type: string
-        format: date-time        
+        format: date-time
       longitude:
         type: number
         format: double
