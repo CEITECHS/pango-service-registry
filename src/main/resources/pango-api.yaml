@@ -1291,6 +1291,8 @@ definitions:
      type: string
     password:
      type: string
+    confirmPassword:
+     type: string
     emailAddress:
      type: string
     address:
