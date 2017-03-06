@@ -748,7 +748,7 @@ paths:
          description: An error with a status code between 4XX and 5XX
          schema:
            $ref: "#/definitions/Error"
-  /verify/confirmAccount:
+  /account-verification/{confirm-token}:
     get:
       tags:
        - User
@@ -761,7 +761,7 @@ paths:
         An endpoint to verify the user's email address
       parameters:
         - name: confirm-token
-          in: query
+          in: path
           type: string
           required: true
       responses:
