@@ -1351,14 +1351,28 @@ definitions:
      type: string
     addressLine2:
      type: string
+    street:
+     type: string
+     description: street name in a county or residential area
+    latitude:
+     type: number
+     format: double
+     description: latitude coordinate of the street
+    longitude:
+     type: number
+     format: double
+     description: longitude coordinate of a street
+    county:
+     type: string
+     description: a residential area or suburb  in a city
     city:
      type: string
     state:
      type: string
-     description: region for E.African countries. For Example Mwanza
+     description: state or region in a country. For Example Mwanza
     zip:
      type: string
-     description: NA for E. Africa region
+     description : post code of the  area city/county
     country:
      type: string
   LoginResource:
