@@ -21,8 +21,8 @@ paths:
     get:
       summary: Get local places
       description: |
-        Places API that returns regions/states with a `country` as the parameter, or cities with `country and region` as parameters |
-        or counties when `country , region and city` as parameters  or streets when both `country, region, city and county` are used parameters
+        Places API that returns regions/states when only a `country` is used as the parameter, or cities when  `country and region` are used as parameters
+        or counties when `country , region and city` are passed as parameters  or streets when both `country, region, city and county` are used parameters
       parameters:
         - name: user-token
           in: header
@@ -63,11 +63,12 @@ paths:
           description: An error with a status code between  4XX and 5XX
           schema:
             $ref: "#/definitions/Error"
-  /properties/{country}:
+  /places/{country}:
     get:
-       summary: Get a list of active rental property unit rented or held by a Pango customer
+       summary: Get local places
        description: |
-         The Property endpoint will return a list of active Pango rental property unit by status as specified in the query parameter
+         Places API  returns locality names or street names starting with a `streetKeyword` in a country.
+         Usecases for this API are auto-suggetsion , suggesting street names as users are typing..
        tags:
        - Places
        - Streets
@@ -89,7 +90,7 @@ paths:
          description: street keyword
        responses:
          200:
-           description: List of Pango rental units assigned to the customer filtered as per the status
+           description: List of Address/Street names starting with a `streetKeyword`
            schema:
             type: array
             items:
@@ -120,14 +121,9 @@ definitions:
       items:
           type: string
           description: a specific error message
-
   Address:
    type: object
    properties:
-    addressLine1:
-     type: string
-    addressLine2:
-     type: string
     street:
      type: string
      description: street name in a county or residential area
