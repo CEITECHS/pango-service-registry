@@ -1,0 +1,154 @@
+# Places APIs
+swagger: '2.0'
+
+# This is your document metadata
+info:
+  version: "0.0.10"
+  title: Pango Places API
+  description: Move you App forwad with Pango Places API
+  # The Domain of Service
+host: dev.pango-apis.com:3000 #localhost:8090
+#Array of sll schemes Pango API supports
+schemes:
+   - https
+   - http
+# Will be prefixed to all paths
+basePath: /apis/v1
+produces:
+ - application/json
+paths:
+  /places:
+    get:
+      summary: Get local places
+      description: |
+        Places API that returns regions/states with a `country` as the parameter, or cities with `country and region` as parameters |
+        or counties when `country , region and city` as parameters  or streets when both `country, region, city and county` are used parameters
+      parameters:
+        - name: user-token
+          in: header
+          type: string
+          description: user access token
+          required: false
+        - name: country
+          in: query
+          description: country name. Ex. Tanzania or India
+          required: true
+          type: string
+          default: Tanzania
+        - name: region
+          in: query
+          description: region name,  Ex. Dar es Salaam or Virginia.
+          type: string
+          required: false
+        - name: city
+          in: query
+          type: string
+          required: false
+          description: city or district name  Ex. Kinondoni or Richmond
+        - name: county
+          in: query
+          type: string
+          description: county/residential area name Ex. Mwenge, Tegeta
+      tags:
+      - Places
+      - Addresses
+      responses:
+        200:
+          description: An array of rental properties
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Address"
+        default:
+          description: An error with a status code between  4XX and 5XX
+          schema:
+            $ref: "#/definitions/Error"
+  /properties/{country}:
+    get:
+       summary: Get a list of active rental property unit rented or held by a Pango customer
+       description: |
+         The Property endpoint will return a list of active Pango rental property unit by status as specified in the query parameter
+       tags:
+       - Places
+       - Streets
+       parameters:
+       - name: user-token
+         in: header
+         type: string
+         description: user access token
+         required: false
+       - name: country
+         in: path
+         type: string
+         description: country name
+         required: true
+       - name: streetKeyword
+         in: query
+         required: true
+         type: string
+         description: street keyword
+       responses:
+         200:
+           description: List of Pango rental units assigned to the customer filtered as per the status
+           schema:
+            type: array
+            items:
+              $ref: "#/definitions/Address"
+         default:
+           description: An error with a status code between  4XX and 5XX
+           schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  Error:
+   type: object
+   properties:
+     title:
+       type: string
+     status:
+       type: integer
+       format: int32
+     detail:
+       type: string
+     timeStamp:
+      type: number
+     developerMessage:
+      type: string
+     errors:
+      type: array
+      description: an Array of errors messages occured
+      items:
+          type: string
+          description: a specific error message
+
+  Address:
+   type: object
+   properties:
+    addressLine1:
+     type: string
+    addressLine2:
+     type: string
+    street:
+     type: string
+     description: street name in a county or residential area
+    latitude:
+     type: number
+     format: double
+     description: latitude coordinate of the street
+    longitude:
+     type: number
+     format: double
+     description: longitude coordinate of a street
+    county:
+     type: string
+     description: a residential area or suburb  in a city
+    city:
+     type: string
+    state:
+     type: string
+     description: state or region in a country. For Example Mwanza
+    zip:
+     type: string
+     description : post code of the  area city/county
+    country:
+     type: string
