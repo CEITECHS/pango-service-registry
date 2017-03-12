@@ -101,26 +101,6 @@ paths:
             $ref: "#/definitions/Error"
 
 definitions:
-  Error:
-   type: object
-   properties:
-     title:
-       type: string
-     status:
-       type: integer
-       format: int32
-     detail:
-       type: string
-     timeStamp:
-      type: number
-     developerMessage:
-      type: string
-     errors:
-      type: array
-      description: an Array of errors messages occured
-      items:
-          type: string
-          description: a specific error message
   Address:
    type: object
    properties:
@@ -148,3 +128,24 @@ definitions:
      description : post code of the  area city/county
     country:
      type: string
+
+  Error:
+   type: object
+   properties:
+     title:
+       type: string
+     status:
+       type: integer
+       format: int32
+     detail:
+       type: string
+     timeStamp:
+      type: number
+     developerMessage:
+      type: string
+     errors:
+      type: array
+      description: an Array of errors messages occured
+      items:
+          type: string
+          description: a specific error message
