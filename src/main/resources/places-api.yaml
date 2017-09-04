@@ -21,8 +21,11 @@ paths:
     get:
       summary: Get local places
       description: |
-        Places API that returns regions/states when only a `country` is used as the parameter, or cities when  `country and region` are used as parameters
-        or counties when `country , region and city` are passed as parameters  or streets when both `country, region, city and county` are used parameters
+        This is the main places API that
+         Returns a list of regions/states when only a **country** is used as the parameter,
+         Returns a list cities when  **country** and **region** are used as parameters
+         Returns a list counties when **country** , **region** and **city** are passed as parameters
+         Returns a list of streets when both **country**, **region**, **city** and **county** are used parameters
       parameters:
         - name: user-token
           in: header
@@ -50,8 +53,10 @@ paths:
           type: string
           description: county/residential area name Ex. Mwenge, Tegeta
       tags:
-      - Places
-      - Addresses
+      - Regions or States
+      - Cities
+      - Counties or Suburbs
+      - Streets
       responses:
         200:
           description: An array of rental properties
@@ -70,7 +75,6 @@ paths:
          Places API  returns locality names or street names starting with a `streetKeyword` in a country.
          Usecases for this API are auto-suggetsion , suggesting street names as users are typing..
        tags:
-       - Places
        - Streets
        parameters:
        - name: user-token
