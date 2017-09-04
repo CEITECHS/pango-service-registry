@@ -7,7 +7,7 @@ info:
   title: Pango Places API
   description: Move you App forwad with Pango Places API
   # The Domain of Service
-host: localhost:3000 #dev.pango-apis.com:3000
+host: dev.pango-apis.com:3000 #localhost:3000 #
 #Array of sll schemes Pango API supports
 schemes:
    - https
