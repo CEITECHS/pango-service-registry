@@ -7,7 +7,7 @@ info:
   title: Pango Places API
   description: Move you App forwad with Pango Places API
   # The Domain of Service
-host: dev.pango-apis.com:3000 #localhost:8090
+host: localhost:3000 #dev.pango-apis.com:3000
 #Array of sll schemes Pango API supports
 schemes:
    - https
@@ -108,29 +108,29 @@ definitions:
   Address:
    type: object
    properties:
-    street:
+    _street:
      type: string
      description: street name in a county or residential area
-    latitude:
+    _latitude:
      type: number
      format: double
      description: latitude coordinate of the street
-    longitude:
+    _longitude:
      type: number
      format: double
      description: longitude coordinate of a street
-    county:
+    _county:
      type: string
      description: a residential area or suburb  in a city
-    city:
+    _city:
      type: string
-    state:
+    _state:
      type: string
      description: state or region in a country. For Example Mwanza
-    zip:
+    _zip:
      type: string
      description : post code of the  area city/county
-    country:
+    _country:
      type: string
 
   Error:
